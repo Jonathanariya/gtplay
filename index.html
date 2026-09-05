@@ -4,1387 +4,1774 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GTPLAY · Neon Private Server</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
-        /* ===== RESET & VARIABLES ===== */
+        /* ============ DESIGN SYSTEM ============ */
+        :root {
+            --bg-void: #07070b;
+            --bg-deep: #0b0b12;
+            --bg-surface: #101018;
+            --bg-elevated: #15151f;
+            --bg-card: rgba(16, 16, 26, 0.82);
+            --bg-glass: rgba(20, 20, 32, 0.65);
+            --bg-hover: rgba(255, 255, 255, 0.04);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(0, 229, 255, 0.25);
+            --border-strong: rgba(0, 229, 255, 0.45);
+            --text-primary: #f2f2f8;
+            --text-secondary: #b8b8cc;
+            --text-tertiary: #777790;
+            --text-faint: #4a4a60;
+            --neon-cyan: #00e5ff;
+            --neon-purple: #a855f7;
+            --neon-pink: #ec4899;
+            --neon-green: #22c55e;
+            --neon-gold: #f59e0b;
+            --neon-red: #ef4444;
+            --gradient-primary: linear-gradient(135deg, #00e5ff, #a855f7);
+            --gradient-pink: linear-gradient(135deg, #ec4899, #a855f7);
+            --gradient-gold: linear-gradient(135deg, #f59e0b, #ef4444);
+            --gradient-green: linear-gradient(135deg, #22c55e, #00e5ff);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 229, 255, 0.03);
+            --shadow-glow: 0 0 50px rgba(0, 229, 255, 0.08);
+            --shadow-float: 0 12px 48px rgba(0, 0, 0, 0.5);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 76px;
+            --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --duration-fast: 0.2s;
+            --duration-base: 0.35s;
+            --duration-slow: 0.6s;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        :root {
-            --bg-primary: #07060b;
-            --bg-surface: rgba(18, 16, 26, 0.75);
-            --bg-card: rgba(22, 20, 34, 0.85);
-            --border-neon-cyan: rgba(0, 245, 255, 0.3);
-            --neon-cyan: #00f5ff;
-            --neon-pink: #ff00e6;
-            --neon-purple: #9d4edd;
-            --neon-gold: #fbbf24;
-            --text-primary: #f0f0ff;
-            --text-dim: #a0a0b8;
-            --text-faint: #5a5a72;
-            --shadow-glow: 0 0 30px rgba(0, 245, 255, 0.08);
-        }
         html {
             scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
+            font-family: var(--font-body);
+            background: var(--bg-void);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-user-select: none;
             user-select: none;
+            display: flex;
         }
 
-        /* ===== ANIMATED BACKGROUND ===== */
-        .bg-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background: radial-gradient(ellipse at 20% 30%, #0f0520 0%, #07060b 70%);
-        }
-        .bg-layer::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(0deg, rgba(0, 245, 255, 0.02) 0px, rgba(0, 245, 255, 0.02) 1px, transparent 1px, transparent 40px),
-                repeating-linear-gradient(90deg, rgba(157, 78, 221, 0.02) 0px, rgba(157, 78, 221, 0.02) 1px, transparent 1px, transparent 40px);
-            pointer-events: none;
-        }
-        .particles {
+        /* ============ ANIMATED BACKGROUND ============ */
+        .aurora-bg {
             position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
-        .particle {
+        .aurora-orb {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--neon-cyan);
             border-radius: 50%;
-            box-shadow: 0 0 12px var(--neon-cyan);
-            animation: floatParticle 18s infinite linear;
-            opacity: 0.3;
+            filter: blur(80px);
+            opacity: 0.35;
+            animation: auroraFloat 16s var(--transition-smooth) infinite alternate;
         }
-        .particle:nth-child(1) {
-            left: 10%;
-            top: 20%;
-            animation-duration: 22s;
-            background: var(--neon-pink);
-            box-shadow: 0 0 12px var(--neon-pink);
-        }
-        .particle:nth-child(2) {
-            left: 80%;
-            top: 60%;
-            animation-duration: 26s;
-            background: var(--neon-purple);
-            box-shadow: 0 0 12px var(--neon-purple);
-        }
-        .particle:nth-child(3) {
-            left: 40%;
-            top: 80%;
+        .aurora-orb:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 229, 255, 0.12);
+            top: -10%;
+            left: -5%;
             animation-duration: 20s;
-            background: var(--neon-gold);
-            box-shadow: 0 0 12px var(--neon-gold);
         }
-        .particle:nth-child(4) {
-            left: 90%;
-            top: 10%;
+        .aurora-orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: rgba(168, 85, 247, 0.1);
+            bottom: -10%;
+            right: -5%;
             animation-duration: 24s;
+            animation-delay: -5s;
         }
-        .particle:nth-child(5) {
-            left: 5%;
-            top: 70%;
-            animation-duration: 28s;
-            background: var(--neon-pink);
-            box-shadow: 0 0 12px var(--neon-pink);
+        .aurora-orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: rgba(236, 72, 153, 0.08);
+            top: 50%;
+            left: 50%;
+            animation-duration: 18s;
+            animation-delay: -10s;
         }
-        .particle:nth-child(6) {
-            left: 60%;
-            top: 15%;
-            animation-duration: 19s;
-            background: var(--neon-purple);
-            box-shadow: 0 0 12px var(--neon-purple);
-        }
-        @keyframes floatParticle {
+        @keyframes auroraFloat {
             0% {
-                transform: translateY(0px) scale(1);
-                opacity: 0.2;
+                transform: translate(0, 0) scale(1);
             }
-            25% {
-                transform: translateY(-40px) scale(1.4);
-                opacity: 0.6;
+            33% {
+                transform: translate(60px, -40px) scale(1.15);
             }
-            50% {
-                transform: translateY(20px) scale(0.8);
-                opacity: 0.3;
-            }
-            75% {
-                transform: translateY(-60px) scale(1.6);
-                opacity: 0.7;
+            66% {
+                transform: translate(-40px, 30px) scale(0.9);
             }
             100% {
-                transform: translateY(0px) scale(1);
-                opacity: 0.2;
+                transform: translate(20px, -20px) scale(1.05);
+            }
+        }
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 50px),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 50px);
+        }
+        .scanline {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 229, 255, 0.005) 50%, transparent 100%);
+            animation: scanMove 8s linear infinite;
+        }
+        @keyframes scanMove {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100%);
             }
         }
 
-        /* ===== SCROLLBAR ===== */
+        /* ============ SCROLLBAR ============ */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
+            background: var(--bg-void);
         }
         ::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 10px;
-            box-shadow: 0 0 20px var(--neon-cyan);
+            background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 20px;
         }
 
-        /* ===== APP CONTAINER ===== */
-        #app {
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            z-index: 100;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(24px);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 14px 16px;
+            transition: width var(--duration-base) var(--transition-smooth), transform var(--duration-base) var(--transition-smooth);
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+            min-height: 60px;
+        }
+        .sidebar-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 16px;
+            color: #000;
+            flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.25);
+            cursor: pointer;
+            transition: all var(--duration-base) var(--transition-bounce);
+        }
+        .sidebar-logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.4);
+        }
+        .sidebar-brand {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--duration-fast) ease;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--transition-smooth);
+            color: var(--text-tertiary);
+            font-weight: 500;
+            font-size: 13px;
+            border: 1px solid transparent;
             position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(168, 85, 247, 0.06));
+            color: var(--neon-cyan);
+            border-color: rgba(0, 229, 255, 0.15);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.04);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            border-radius: 20px;
+            background: var(--gradient-primary);
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+        .nav-item .nav-icon {
+            width: 22px;
+            font-size: 16px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: all var(--duration-fast) ease;
+        }
+        .nav-item.active .nav-icon {
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
+        }
+        .sidebar-footer {
+            padding-top: 14px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .sidebar-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            background: rgba(0, 229, 255, 0.04);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            white-space: nowrap;
+            transition: all var(--duration-fast) ease;
+        }
+        .sidebar-status .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 16px var(--neon-cyan);
+            animation: pulseDot 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        .sidebar-status .status-dot.offline {
+            background: var(--neon-red);
+            box-shadow: 0 0 16px var(--neon-red);
+            animation: none;
+        }
+        @keyframes pulseDot {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+        }
+        .sidebar-status-text {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* ===== TOPBAR ===== */
+        /* ============ MAIN CONTENT ============ */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            z-index: 1;
+            position: relative;
+            padding: 0 32px 32px;
+            transition: margin-left var(--duration-base) var(--transition-smooth);
+        }
+
+        /* ============ TOPBAR ============ */
         .topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid rgba(0, 245, 255, 0.1);
-            margin-bottom: 30px;
+            padding: 20px 0 16px;
+            margin-bottom: 8px;
             flex-wrap: wrap;
-            gap: 12px;
-        }
-        .topbar-left {
-            display: flex;
-            align-items: center;
             gap: 16px;
         }
-        .topbar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-        .topbar-logo img {
-            height: 50px;
-            width: auto;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 245, 255, 0.2);
-            box-shadow: 0 0 25px rgba(0, 245, 255, 0.15);
-            transition: all 0.3s;
-        }
-        .topbar-logo img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
-        }
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 40px rgba(0, 245, 255, 0.2);
-            letter-spacing: 2px;
-        }
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .burger-btn {
-            width: 48px;
-            height: 48px;
-            background: rgba(0, 245, 255, 0.06);
-            border: 1px solid rgba(0, 245, 255, 0.2);
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: all 0.25s;
-            backdrop-filter: blur(8px);
-        }
-        .burger-btn:hover {
-            background: rgba(0, 245, 255, 0.12);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
-        }
-        .burger-btn.open {
-            background: rgba(255, 0, 230, 0.1);
-            border-color: var(--neon-pink);
-        }
-        .burger-line {
-            width: 22px;
-            height: 2px;
-            background: var(--text-primary);
-            border-radius: 4px;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .burger-btn.open .burger-line:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-            background: var(--neon-pink);
-        }
-        .burger-btn.open .burger-line:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-        .burger-btn.open .burger-line:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-            background: var(--neon-pink);
-        }
-
-        /* ===== BURGER MENU ===== */
-        .burger-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 198;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .burger-overlay.open {
-            opacity: 1;
-            pointer-events: all;
-        }
-        .burger-menu {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 320px;
-            height: 100vh;
-            z-index: 200;
-            background: rgba(10, 8, 18, 0.95);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(0, 245, 255, 0.15);
-            padding: 30px 24px;
-            transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
-        }
-        .burger-menu.open {
-            transform: translateX(0);
-        }
-        .burger-menu-header {
-            padding-bottom: 24px;
-            border-bottom: 1px solid rgba(0, 245, 255, 0.08);
-            margin-bottom: 24px;
-        }
-        .burger-menu-user {
-            font-family: 'Orbitron', sans-serif;
+        .topbar-title {
+            font-family: var(--font-display);
             font-size: 22px;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .burger-menu-sub {
-            font-size: 12px;
-            color: var(--text-faint);
-            margin-top: 4px;
-            letter-spacing: 1px;
-        }
-        .burger-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex: 1;
-        }
-        .burger-nav-item {
+            letter-spacing: 0.5px;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 18px;
-            padding: 14px 18px;
-            border-radius: 14px;
+            gap: 14px;
+        }
+        .topbar-title .page-icon {
+            font-size: 24px;
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .topbar-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-            color: var(--text-dim);
-            border: 1px solid transparent;
+            transition: all var(--duration-fast) var(--transition-smooth);
+            font-size: 16px;
+            backdrop-filter: blur(8px);
         }
-        .burger-nav-item:hover {
-            background: rgba(0, 245, 255, 0.05);
-            color: var(--text-primary);
-            border-color: rgba(0, 245, 255, 0.1);
-            transform: translateX(4px);
-        }
-        .burger-nav-item.active {
-            background: linear-gradient(135deg, rgba(0, 245, 255, 0.08), rgba(157, 78, 221, 0.08));
+        .topbar-btn:hover {
+            background: var(--bg-hover);
             color: var(--neon-cyan);
-            border-color: rgba(0, 245, 255, 0.15);
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.02);
-        }
-        .burger-nav-item .nav-icon {
-            width: 28px;
-            font-size: 18px;
-            text-align: center;
-            color: var(--text-faint);
-        }
-        .burger-nav-item.active .nav-icon {
-            color: var(--neon-cyan);
+            border-color: var(--border-glow);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+            transform: translateY(-2px);
         }
 
-        /* ===== PAGE CONTAINER ===== */
+        /* ============ PAGE TRANSITIONS ============ */
         .page {
             display: none;
-            animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: pageEnter var(--duration-slow) var(--transition-smooth);
         }
         .page.active {
             display: block;
         }
-        @keyframes fadeSlideUp {
+        @keyframes pageEnter {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(24px) scale(0.98);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        /* ===== GLASS CARD ===== */
-        .glass-card {
+        /* ============ CARD ============ */
+        .card {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            padding: 28px 26px;
-            box-shadow: var(--shadow-glow);
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 22px;
+            transition: all var(--duration-base) var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
         }
-        .glass-card:hover {
-            border-color: rgba(0, 245, 255, 0.15);
-            box-shadow: 0 0 40px rgba(0, 245, 255, 0.05), inset 0 0 40px rgba(0, 245, 255, 0.02);
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.2), transparent);
+            pointer-events: none;
+        }
+        .card:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow), var(--shadow-card);
             transform: translateY(-2px);
         }
-
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
         .card-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
+            font-family: var(--font-display);
+            font-size: 15px;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-bottom: 18px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--text-primary);
         }
         .card-title i {
             color: var(--neon-cyan);
-            filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.3));
+            font-size: 18px;
+            filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.3));
         }
 
-        /* ===== HEADER DASHBOARD ===== */
-        .dash-header {
+        /* ============ HERO DASHBOARD ============ */
+        .hero-card {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.04), rgba(168, 85, 247, 0.03)), var(--bg-card);
+            border: 1px solid rgba(0, 229, 255, 0.12);
+            border-radius: var(--radius-xl);
+            padding: 32px 30px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-float);
+            backdrop-filter: blur(24px);
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.06), transparent 70%);
+            pointer-events: none;
+        }
+        .hero-flex {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
         }
-        .dash-header-left {
+        .hero-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        .dash-header-left i {
-            font-size: 34px;
-            color: var(--neon-cyan);
-            filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.2));
+        .hero-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 22px;
+            color: #000;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.3);
+            flex-shrink: 0;
         }
-        .dash-header-info h1 {
-            font-family: 'Orbitron', sans-serif;
+        .hero-info h1 {
+            font-family: var(--font-display);
             font-size: 28px;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 1px;
-            background: linear-gradient(135deg, #fff, var(--neon-cyan));
+            background: linear-gradient(135deg, #ffffff, var(--neon-cyan));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            margin-bottom: 4px;
         }
-        .dash-meta {
+        .hero-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px 16px;
-            margin-top: 4px;
+            gap: 6px 14px;
         }
-        .dash-meta span {
-            font-size: 12px;
-            color: var(--text-faint);
-            font-family: 'Inter', sans-serif;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 2px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+        .hero-meta span {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-subtle);
+            letter-spacing: 0.3px;
         }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 24px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 14px;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(8px);
-            border: 1px solid transparent;
-        }
-        .status-online {
-            background: rgba(0, 245, 255, 0.08);
-            border-color: rgba(0, 245, 255, 0.25);
+        .hero-meta span i {
+            margin-right: 6px;
             color: var(--neon-cyan);
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.05);
         }
-        .status-offline {
-            background: rgba(255, 0, 0, 0.08);
-            border-color: rgba(255, 0, 0, 0.25);
-            color: #ff4d4d;
+        .hero-status {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 24px;
+            border-radius: var(--radius-full);
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all var(--duration-base) var(--transition-smooth);
         }
-        .pulse-dot {
-            width: 12px;
-            height: 12px;
+        .hero-status.online {
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.06);
+        }
+        .hero-status.offline {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: var(--neon-red);
+        }
+        .hero-status .dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: var(--neon-cyan);
-            box-shadow: 0 0 20px var(--neon-cyan);
-            animation: pulse 2s infinite;
+            background: currentColor;
+            box-shadow: 0 0 16px currentColor;
+            animation: pulseDot 2s ease-in-out infinite;
         }
-        .status-offline .pulse-dot {
-            background: #ff4d4d;
-            box-shadow: 0 0 20px #ff4d4d;
+        .hero-status.offline .dot {
             animation: none;
         }
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.4);
-                opacity: 0.4;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
 
-        /* ===== METRIC ROW ===== */
+        /* ============ METRIC GRID ============ */
         .metric-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 22px;
         }
-        .metric-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 20px 16px;
+        .metric-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px 18px;
             text-align: center;
-            transition: all 0.3s;
-            backdrop-filter: blur(4px);
+            transition: all var(--duration-base) var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            cursor: default;
         }
-        .metric-item:hover {
-            background: rgba(0, 245, 255, 0.02);
-            border-color: rgba(0, 245, 255, 0.1);
+        .metric-card:hover {
+            border-color: var(--border-glow);
             transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
         }
-        .metric-item i {
-            font-size: 28px;
-            margin-bottom: 8px;
+        .metric-card .metric-icon {
+            font-size: 26px;
+            margin-bottom: 10px;
             display: block;
         }
-        .metric-label {
+        .metric-card .metric-label {
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-faint);
-            font-weight: 600;
-        }
-        .metric-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 32px;
             font-weight: 700;
-            margin-top: 4px;
-            background: linear-gradient(135deg, #fff, var(--neon-cyan));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            margin-bottom: 2px;
         }
-        .metric-value.pink {
-            background: linear-gradient(135deg, #fff, var(--neon-pink));
-            -webkit-background-clip: text;
-            background-clip: text;
+        .metric-card .metric-value {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            transition: all var(--duration-fast) ease;
         }
-        .metric-value.purple {
-            background: linear-gradient(135deg, #fff, var(--neon-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
+        .metric-card .metric-value.cyan {
+            color: var(--neon-cyan);
+        }
+        .metric-card .metric-value.pink {
+            color: var(--neon-pink);
+        }
+        .metric-card .metric-value.purple {
+            color: var(--neon-purple);
+        }
+        .metric-card .metric-value.green {
+            color: var(--neon-green);
         }
 
-        /* ===== PROGRESS ===== */
+        /* ============ PROGRESS BARS ============ */
         .progress-wrap {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
         .progress-wrap:last-child {
             margin-bottom: 0;
         }
-        .progress-label {
+        .progress-header {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-dim);
-            margin-bottom: 6px;
+            align-items: center;
+            margin-bottom: 8px;
         }
-        .progress-bar {
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+        .progress-value {
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .progress-track {
             height: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-full);
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            position: relative;
         }
         .progress-fill {
             height: 100%;
-            border-radius: 20px;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
-            box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
-            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: var(--radius-full);
+            transition: width 1.2s var(--transition-smooth);
+            position: relative;
             width: 0%;
         }
-        .progress-fill.cpu {
-            background: linear-gradient(90deg, var(--neon-gold), #ff6b6b);
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: var(--radius-full);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: shimmer 2s ease-in-out infinite;
         }
-        .progress-fill.ram {
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
-        .progress-fill.storage {
-            background: linear-gradient(90deg, #4ade80, var(--neon-cyan));
+        .fill-cpu {
+            background: var(--gradient-gold);
+        }
+        .fill-ram {
+            background: var(--gradient-primary);
+        }
+        .fill-storage {
+            background: var(--gradient-green);
+        }
+        .val-cpu {
+            color: var(--neon-gold);
+        }
+        .val-ram {
+            color: var(--neon-cyan);
+        }
+        .val-storage {
+            color: var(--neon-green);
         }
 
-        /* ===== CATEGORY GRID ===== */
-        .cat-grid {
+        /* ============ DUAL COLUMN LAYOUT ============ */
+        .dual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        /* ============ CATEGORY BOXES ============ */
+        .cat-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
+            gap: 12px;
         }
-        .cat-box {
+        .cat-tile {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 18px 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 16px 12px;
             text-align: center;
-            transition: all 0.3s;
+            transition: all var(--duration-base) var(--transition-smooth);
+            cursor: default;
         }
-        .cat-box:hover {
-            background: rgba(0, 245, 255, 0.03);
-            border-color: rgba(0, 245, 255, 0.15);
-            transform: scale(1.02);
+        .cat-tile:hover {
+            background: rgba(0, 229, 255, 0.03);
+            border-color: var(--border-glow);
+            transform: translateY(-4px);
         }
-        .cat-tag {
+        .cat-badge {
             display: inline-block;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 10px;
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            font-size: 9px;
             font-weight: 700;
-            letter-spacing: 1px;
-            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1.5px;
+            font-family: var(--font-display);
             margin-bottom: 8px;
         }
-        .tag-starts {
-            background: rgba(74, 222, 128, 0.12);
-            color: #4ade80;
-            border: 1px solid rgba(74, 222, 128, 0.2);
+        .badge-starts {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--neon-green);
+            border: 1px solid rgba(34, 197, 94, 0.2);
         }
-        .tag-bfg {
-            background: rgba(157, 78, 221, 0.12);
+        .badge-bfg {
+            background: rgba(168, 85, 247, 0.1);
             color: var(--neon-purple);
-            border: 1px solid rgba(157, 78, 221, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.2);
         }
-        .tag-shop {
-            background: rgba(251, 191, 36, 0.12);
+        .badge-shop {
+            background: rgba(245, 158, 11, 0.1);
             color: var(--neon-gold);
-            border: 1px solid rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.2);
         }
-        .cat-count {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 30px;
+        .cat-number {
+            font-family: var(--font-display);
+            font-size: 26px;
             font-weight: 700;
         }
-        .cat-count.green {
-            color: #4ade80;
+        .cat-number.green {
+            color: var(--neon-green);
         }
-        .cat-count.purple {
+        .cat-number.purple {
             color: var(--neon-purple);
         }
-        .cat-count.yellow {
+        .cat-number.gold {
             color: var(--neon-gold);
         }
 
-        /* ===== WORLDS ===== */
-        .world-stats-row {
+        /* ============ WORLDS GRID ============ */
+        .worlds-stats-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 18px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
         .world-stat-pill {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 40px;
-            padding: 6px 18px;
-            font-size: 12px;
-            color: var(--text-dim);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            padding: 6px 16px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.3px;
+            transition: all var(--duration-fast) ease;
+        }
+        .world-stat-pill:hover {
+            border-color: var(--border-glow);
+            color: var(--text-secondary);
         }
         .world-stat-pill span {
-            font-family: 'Orbitron', sans-serif;
+            font-family: var(--font-display);
             color: var(--neon-cyan);
             font-weight: 600;
+            font-size: 12px;
         }
         .worlds-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
         }
-        .world-card {
+        .world-tile {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 14px;
-            padding: 12px 8px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 10px 8px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all var(--duration-fast) var(--transition-smooth);
         }
-        .world-card:hover {
-            background: rgba(0, 245, 255, 0.04);
-            border-color: var(--neon-cyan);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.05);
+        .world-tile:hover {
+            background: rgba(0, 229, 255, 0.04);
+            border-color: var(--border-strong);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.06);
         }
-        .world-card .world-name {
-            font-size: 13px;
+        .world-tile .world-name {
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .world-cat-tag {
-            font-size: 9px;
+        .world-tile .world-tag {
+            font-size: 8px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            padding: 2px 10px;
-            border-radius: 20px;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
             background: rgba(255, 255, 255, 0.04);
             color: var(--text-faint);
         }
 
-        /* ===== HOST SECTION ===== */
-        .host-item {
+        /* ============ HOST ITEMS ============ */
+        .host-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .host-row {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 12px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
-            transition: all 0.25s;
-            margin-bottom: 8px;
+            gap: 10px;
+            transition: all var(--duration-fast) var(--transition-smooth);
         }
-        .host-item:hover {
-            background: rgba(0, 245, 255, 0.02);
-            border-color: rgba(0, 245, 255, 0.1);
+        .host-row:hover {
+            background: rgba(0, 229, 255, 0.03);
+            border-color: var(--border-glow);
+            transform: translateX(4px);
         }
-        .host-info {
+        .host-row-left {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-        .host-info i {
-            font-size: 20px;
-            width: 30px;
+        .host-row-left i {
+            font-size: 18px;
+            width: 28px;
             text-align: center;
             color: var(--neon-cyan);
         }
-        .host-name {
+        .host-row-name {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
+            color: var(--text-primary);
         }
-        .host-platform {
-            font-size: 11px;
+        .host-row-platform {
+            font-size: 10px;
             color: var(--text-faint);
             background: rgba(255, 255, 255, 0.04);
-            padding: 2px 12px;
-            border-radius: 20px;
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.5px;
         }
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-dim);
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--duration-fast) var(--transition-smooth);
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-body);
+            letter-spacing: 0.3px;
         }
-        .copy-btn:hover {
-            background: rgba(0, 245, 255, 0.05);
+        .btn-copy:hover {
+            background: rgba(0, 229, 255, 0.06);
             border-color: var(--neon-cyan);
             color: var(--neon-cyan);
-            box-shadow: 0 0 25px rgba(0, 245, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
+            transform: scale(1.03);
         }
-        .download-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 8px 12px;
-            border-radius: 40px;
-            color: var(--text-dim);
-            transition: all 0.2s;
+        .btn-download {
+            background: rgba(236, 72, 153, 0.06);
+            border: 1px solid rgba(236, 72, 153, 0.15);
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--neon-pink);
+            transition: all var(--duration-fast) var(--transition-smooth);
             display: inline-flex;
             align-items: center;
+            gap: 6px;
             text-decoration: none;
+            letter-spacing: 0.3px;
         }
-        .download-btn:hover {
-            background: rgba(0, 245, 255, 0.05);
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
+        .btn-download:hover {
+            background: rgba(236, 72, 153, 0.12);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.1);
+            transform: scale(1.03);
         }
 
-        /* ===== HOW TO PLAY ===== */
+        /* ============ HOW TO PLAY ============ */
         .how-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 18px;
         }
         .how-card {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 22px;
-            transition: all 0.3s;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px 20px;
+            transition: all var(--duration-base) var(--transition-smooth);
         }
         .how-card:hover {
-            background: rgba(0, 245, 255, 0.02);
-            border-color: rgba(0, 245, 255, 0.1);
+            background: rgba(0, 229, 255, 0.02);
+            border-color: var(--border-glow);
             transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
         }
-        .how-card h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
+        .how-card h4 {
+            font-family: var(--font-display);
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            letter-spacing: 0.5px;
         }
-        .how-card .step-list {
+        .how-card ul {
             list-style: none;
             padding: 0;
             counter-reset: step;
         }
-        .how-card .step-list li {
-            color: var(--text-dim);
-            font-size: 14px;
-            margin-bottom: 10px;
-            padding-left: 28px;
+        .how-card ul li {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 8px;
+            padding-left: 30px;
             position: relative;
             line-height: 1.5;
+            letter-spacing: 0.2px;
         }
-        .how-card .step-list li::before {
+        .how-card ul li::before {
             counter-increment: step;
             content: counter(step);
             position: absolute;
             left: 0;
             top: 0;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
+            font-family: var(--font-display);
+            font-size: 10px;
             font-weight: 700;
             color: var(--neon-cyan);
-            background: rgba(0, 245, 255, 0.06);
+            background: rgba(0, 229, 255, 0.06);
             width: 20px;
             height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            border: 1px solid rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.12);
         }
         .inline-copy {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 2px 14px;
-            border-radius: 40px;
-            font-size: 12px;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
             cursor: pointer;
-            color: var(--text-dim);
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-            margin-left: 4px;
+            color: var(--text-tertiary);
+            transition: all var(--duration-fast) ease;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
         }
         .inline-copy:hover {
-            background: rgba(0, 245, 255, 0.05);
+            background: rgba(0, 229, 255, 0.06);
             color: var(--neon-cyan);
             border-color: var(--neon-cyan);
         }
 
-        /* ===== EVENTS ===== */
+        /* ============ EVENTS ============ */
         .event-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
         }
         .event-card {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 24px;
-            transition: all 0.3s;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px 18px;
+            transition: all var(--duration-base) var(--transition-smooth);
             position: relative;
             overflow: hidden;
         }
-        .event-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(0, 245, 255, 0.02), transparent, rgba(157, 78, 221, 0.02), transparent);
-            animation: rotateGlow 10s linear infinite;
-            pointer-events: none;
-        }
-        @keyframes rotateGlow {
-            to {
-                transform: rotate(360deg);
-            }
-        }
         .event-card:hover {
-            border-color: rgba(0, 245, 255, 0.15);
+            border-color: var(--border-glow);
             transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-float);
         }
-        .event-card h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
+        .event-card h5 {
+            font-family: var(--font-display);
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
         .event-card p {
-            font-size: 13px;
-            color: var(--text-dim);
+            font-size: 12px;
+            color: var(--text-tertiary);
             line-height: 1.6;
-            position: relative;
-            z-index: 1;
+            letter-spacing: 0.2px;
         }
         .event-tag {
             display: inline-block;
-            margin-top: 14px;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 10px;
+            margin-top: 12px;
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            font-size: 9px;
             font-weight: 700;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.5px;
-            background: rgba(0, 245, 255, 0.06);
-            border: 1px solid rgba(0, 245, 255, 0.1);
+            font-family: var(--font-display);
+            letter-spacing: 1px;
+            background: rgba(0, 229, 255, 0.06);
+            border: 1px solid rgba(0, 229, 255, 0.1);
             color: var(--neon-cyan);
-            position: relative;
-            z-index: 1;
+            transition: all var(--duration-fast) ease;
         }
 
-        /* ===== COMMUNITY ===== */
-        .community-btn {
+        /* ============ COMMUNITY ============ */
+        .community-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+        }
+        .btn-community {
             display: inline-flex;
             align-items: center;
-            gap: 14px;
-            padding: 16px 36px;
-            border-radius: 60px;
+            gap: 12px;
+            padding: 16px 32px;
+            border-radius: var(--radius-full);
             font-weight: 700;
-            font-size: 16px;
+            font-size: 15px;
             text-decoration: none;
-            transition: all 0.3s;
-            font-family: 'Orbitron', sans-serif;
+            transition: all var(--duration-base) var(--transition-bounce);
+            font-family: var(--font-display);
             letter-spacing: 0.5px;
-            border: 1px solid transparent;
+            border: none;
+            cursor: pointer;
         }
-        .community-btn.discord {
+        .btn-community:hover {
+            transform: translateY(-4px) scale(1.03);
+        }
+        .btn-discord {
             background: #5865F2;
             color: #fff;
-            box-shadow: 0 0 40px rgba(88, 101, 242, 0.15);
+            box-shadow: 0 8px 30px rgba(88, 101, 242, 0.3);
         }
-        .community-btn.discord:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 50px rgba(88, 101, 242, 0.3);
+        .btn-discord:hover {
+            box-shadow: 0 12px 40px rgba(88, 101, 242, 0.5);
         }
-        .community-btn.whatsapp {
+        .btn-whatsapp {
             background: #25D366;
             color: #fff;
-            box-shadow: 0 0 40px rgba(37, 211, 102, 0.15);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.3);
         }
-        .community-btn.whatsapp:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 50px rgba(37, 211, 102, 0.3);
+        .btn-whatsapp:hover {
+            box-shadow: 0 12px 40px rgba(37, 211, 102, 0.5);
         }
 
-        /* ===== SEARCH ===== */
-        .search-container {
+        /* ============ SEARCH ============ */
+        .search-wrapper {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
         .search-input {
             flex: 1;
             min-width: 200px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
             padding: 14px 20px;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-primary);
             outline: none;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
+            font-family: var(--font-body);
+            transition: all var(--duration-fast) var(--transition-smooth);
+            letter-spacing: 0.3px;
         }
         .search-input:focus {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.05);
-            background: rgba(0, 245, 255, 0.02);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.06);
+            background: rgba(0, 229, 255, 0.03);
         }
-        .search-btn {
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        .search-input::placeholder {
+            color: var(--text-faint);
+        }
+        .btn-search {
+            background: var(--gradient-primary);
             border: none;
-            border-radius: 16px;
-            padding: 14px 32px;
+            border-radius: var(--radius-md);
+            padding: 14px 30px;
             font-weight: 700;
-            font-size: 15px;
-            color: #07060b;
+            font-size: 14px;
+            color: #000;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all var(--duration-base) var(--transition-bounce);
             display: flex;
             align-items: center;
             gap: 10px;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
+            font-family: var(--font-display);
+            letter-spacing: 0.8px;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.15);
         }
-        .search-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 60px rgba(0, 245, 255, 0.2);
+        .btn-search:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 40px rgba(0, 229, 255, 0.3);
         }
 
-        /* ===== TOAST ===== */
+        /* ============ TOAST ============ */
         .toast {
             position: fixed;
-            bottom: 40px;
+            bottom: 32px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 245, 255, 0.15);
-            padding: 14px 32px;
-            border-radius: 60px;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--bg-elevated);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glow);
+            padding: 14px 28px;
+            border-radius: var(--radius-full);
             font-weight: 500;
             color: var(--text-primary);
-            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: var(--shadow-float), 0 0 40px rgba(0, 229, 255, 0.05);
             z-index: 999;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all var(--duration-base) var(--transition-bounce);
             opacity: 0;
             pointer-events: none;
-            font-size: 14px;
+            font-size: 13px;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+        .toast i {
+            color: var(--neon-cyan);
+            font-size: 16px;
+        }
 
-        /* ===== RESPONSIVE ===== */
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 220px;
+            }
+            .main {
+                padding: 0 20px 24px;
+            }
+            .dual-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         @media (max-width: 768px) {
-            #app {
-                padding: 0 12px 30px;
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 200;
+                box-shadow: 20px 0 60px rgba(0, 0, 0, 0.6);
             }
-            .topbar {
-                padding: 12px 0;
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
-            .logo-text {
-                font-size: 20px;
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(4px);
+                z-index: 150;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity var(--duration-base) ease;
             }
-            .topbar-logo img {
-                height: 38px;
+            .sidebar-overlay.active {
+                opacity: 1;
+                pointer-events: all;
             }
-            .dash-header-info h1 {
+            .main {
+                margin-left: 0;
+                padding: 0 14px 20px;
+            }
+            .topbar-title {
+                font-size: 18px;
+            }
+            .hero-info h1 {
                 font-size: 22px;
+            }
+            .hero-card {
+                padding: 22px 18px;
             }
             .metric-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
-            .metric-value {
-                font-size: 24px;
+            .metric-card .metric-value {
+                font-size: 22px;
+            }
+            .card {
+                padding: 18px 16px;
+                border-radius: var(--radius-md);
             }
             .how-grid {
                 grid-template-columns: 1fr;
             }
-            .burger-menu {
-                width: 280px;
-                padding: 24px 18px;
-            }
-            .glass-card {
-                padding: 18px 16px;
-                border-radius: 18px;
-            }
-            .cat-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .dash-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .status-badge {
-                align-self: flex-start;
-                padding: 8px 18px;
-                font-size: 12px;
-            }
-            .worlds-grid {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            }
             .event-grid {
                 grid-template-columns: 1fr;
             }
-            .search-container {
-                flex-direction: column;
+            .cat-row {
+                grid-template-columns: 1fr 1fr;
             }
-            .search-btn {
-                justify-content: center;
+            .worlds-grid {
+                grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
             }
             .toast {
-                font-size: 12px;
-                padding: 12px 20px;
+                font-size: 11px;
+                padding: 10px 18px;
                 white-space: normal;
                 max-width: 90vw;
                 text-align: center;
+            }
+            .btn-community {
+                padding: 12px 22px;
+                font-size: 13px;
+            }
+            .mobile-menu-btn {
+                display: flex !important;
             }
         }
         @media (max-width: 480px) {
             .metric-grid {
                 grid-template-columns: 1fr;
             }
-            .cat-grid {
+            .cat-row {
                 grid-template-columns: 1fr;
             }
-            .burger-menu {
-                width: 100%;
-                right: 0;
-                border-radius: 0;
+            .hero-flex {
+                flex-direction: column;
+                align-items: flex-start;
             }
+            .hero-status {
+                align-self: flex-start;
+                padding: 10px 18px;
+                font-size: 11px;
+            }
+            .dual-grid {
+                gap: 14px;
+            }
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all var(--duration-fast) var(--transition-smooth);
+            backdrop-filter: blur(8px);
+        }
+        .mobile-menu-btn:hover {
+            border-color: var(--border-glow);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+        }
+
+        /* Chart container */
+        .chart-container {
+            height: 180px;
+            position: relative;
         }
     </style>
 </head>
 <body>
     <!-- Background Layers -->
-    <div class="bg-layer"></div>
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+    <div class="aurora-bg">
+        <div class="aurora-orb"></div>
+        <div class="aurora-orb"></div>
+        <div class="aurora-orb"></div>
     </div>
+    <div class="grid-overlay"></div>
+    <div class="scanline"></div>
 
-    <div id="app">
-        <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="topbar-left">
-                <div class="topbar-logo" id="logoHomeBtn">
-                    <img src="GTPLAY.jpeg" alt="GTPLAY Logo" onerror="this.style.display='none';">
-                    <span class="logo-text">GTPLAY</span>
-                </div>
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo" onclick="navigateTo('home')">GT</div>
+            <span class="sidebar-brand">GTPLAY</span>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <div class="nav-item active" data-page="home" onclick="navigateTo('home')">
+                <span class="nav-icon"><i class="fas fa-home"></i></span> Home
             </div>
-            <div class="topbar-right">
-                <div class="burger-btn" id="burgerBtn" onclick="toggleBurger()">
-                    <div class="burger-line"></div>
-                    <div class="burger-line"></div>
-                    <div class="burger-line"></div>
-                </div>
+            <div class="nav-item" data-page="info" onclick="navigateTo('info')">
+                <span class="nav-icon"><i class="fas fa-info-circle"></i></span> Info
+            </div>
+            <div class="nav-item" data-page="host" onclick="navigateTo('host')">
+                <span class="nav-icon"><i class="fas fa-plug"></i></span> Host
+            </div>
+            <div class="nav-item" data-page="howtoplay" onclick="navigateTo('howtoplay')">
+                <span class="nav-icon"><i class="fas fa-gamepad"></i></span> How to Play
+            </div>
+            <div class="nav-item" data-page="search" onclick="navigateTo('search')">
+                <span class="nav-icon"><i class="fas fa-search"></i></span> Search Item
+            </div>
+            <div class="nav-item" data-page="event" onclick="navigateTo('event')">
+                <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span> Events
+            </div>
+            <div class="nav-item" data-page="community" onclick="navigateTo('community')">
+                <span class="nav-icon"><i class="fas fa-users"></i></span> Community
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-status" id="sidebarStatus">
+                <span class="status-dot" id="sidebarStatusDot"></span>
+                <span class="sidebar-status-text" id="sidebarStatusText">CONNECTING...</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main" id="mainContent">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <i class="fas fa-server page-icon" id="topbarIcon"></i>
+                <span id="topbarTitle">Dashboard</span>
+            </div>
+            <div class="topbar-actions">
+                <button class="topbar-btn" onclick="refreshData()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                <button class="topbar-btn" onclick="navigateTo('community')" title="Community"><i class="fas fa-bell"></i></button>
             </div>
         </header>
 
-        <!-- OVERLAY & MENU -->
-        <div class="burger-overlay" id="burgerOverlay" onclick="closeBurger()"></div>
-        <div class="burger-menu" id="burgerMenu">
-            <div class="burger-menu-header">
-                <div class="burger-menu-user">GTPLAY</div>
-                <div class="burger-menu-sub">Private Server · Neon Network</div>
-            </div>
-            <nav class="burger-nav">
-                <div class="burger-nav-item active" id="nav-home" onclick="navTo('home')"><span class="nav-icon"><i class="fas fa-home"></i></span> Home</div>
-                <div class="burger-nav-item" id="nav-info" onclick="navTo('info')"><span class="nav-icon"><i class="fas fa-info-circle"></i></span> Info</div>
-                <div class="burger-nav-item" id="nav-host" onclick="navTo('host')"><span class="nav-icon"><i class="fas fa-plug"></i></span> Host</div>
-                <div class="burger-nav-item" id="nav-howtoplay" onclick="navTo('howtoplay')"><span class="nav-icon"><i class="fas fa-gamepad"></i></span> How to Play</div>
-                <div class="burger-nav-item" id="nav-search" onclick="navTo('search')"><span class="nav-icon"><i class="fas fa-search"></i></span> Search Item</div>
-                <div class="burger-nav-item" id="nav-event" onclick="navTo('event')"><span class="nav-icon"><i class="fas fa-calendar-alt"></i></span> Event</div>
-                <div class="burger-nav-item" id="nav-community" onclick="navTo('community')"><span class="nav-icon"><i class="fas fa-users"></i></span> Community</div>
-            </nav>
-        </div>
-
         <!-- PAGE: HOME -->
         <div class="page active" id="page-home">
-            <div class="glass-card">
-                <div class="dash-header">
-                    <div class="dash-header-left">
-                        <i class="fas fa-server"></i>
-                        <div class="dash-header-info">
+            <!-- Hero Card -->
+            <div class="hero-card">
+                <div class="hero-flex">
+                    <div class="hero-left">
+                        <div class="hero-avatar">GT</div>
+                        <div class="hero-info">
                             <h1 id="serverName">GTPLAY</h1>
-                            <div class="dash-meta">
-                                <span id="serverIdBadge">ID: 6986</span>
-                                <span id="serverIP">91.134.85.13:6986</span>
+                            <div class="hero-meta">
+                                <span><i class="fas fa-fingerprint"></i> ID: <b id="serverIdBadge">6986</b></span>
+                                <span><i class="fas fa-globe"></i> <b id="serverIP">91.134.85.13:6986</b></span>
+                                <span><i class="fas fa-sync-alt"></i> <span id="lastUpdate">-</span></span>
                             </div>
                         </div>
                     </div>
-                    <div class="status-badge status-online" id="statusContainer">
-                        <span class="pulse-dot"></span>
+                    <div class="hero-status online" id="statusContainer">
+                        <span class="dot"></span>
                         <span id="statusText">ONLINE</span>
-                        <span id="playerCount" style="font-weight:400;opacity:0.7;font-family:'Inter';">(0)</span>
+                        <span id="playerCount" style="font-weight:400;opacity:0.7;font-family:var(--font-body);">(0 players)</span>
                     </div>
-                </div>
-                <div style="margin-top:14px;font-size:12px;color:var(--text-faint);display:flex;justify-content:space-between;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.04);padding-top:14px;">
-                    <span><i class="far fa-clock"></i> Last update: <span id="lastUpdate">-</span></span>
-                    <span><i class="fas fa-sync-alt fa-fw"></i> Live data</span>
                 </div>
             </div>
 
+            <!-- Metric Grid -->
             <div class="metric-grid">
-                <div class="metric-item"><i class="fas fa-microchip" style="color:var(--neon-gold);"></i><div class="metric-label">CPU</div><div class="metric-value" id="cpuUsage">0%</div></div>
-                <div class="metric-item"><i class="fas fa-memory" style="color:var(--neon-cyan);"></i><div class="metric-label">RAM</div><div class="metric-value pink" id="memoryUsage">0 MB</div></div>
-                <div class="metric-item"><i class="fas fa-database" style="color:#4ade80;"></i><div class="metric-label">STORAGE</div><div class="metric-value purple" id="storageUsage">0 MB</div></div>
+                <div class="metric-card">
+                    <i class="fas fa-microchip metric-icon" style="color:var(--neon-gold);"></i>
+                    <div class="metric-label">CPU</div>
+                    <div class="metric-value cyan" id="cpuUsage">0%</div>
+                </div>
+                <div class="metric-card">
+                    <i class="fas fa-memory metric-icon" style="color:var(--neon-cyan);"></i>
+                    <div class="metric-label">Memory</div>
+                    <div class="metric-value pink" id="memoryUsage">0 MB</div>
+                </div>
+                <div class="metric-card">
+                    <i class="fas fa-database metric-icon" style="color:var(--neon-green);"></i>
+                    <div class="metric-label">Storage</div>
+                    <div class="metric-value purple" id="storageUsage">0 MB</div>
+                </div>
             </div>
 
-            <div class="glass-card">
-                <div class="card-title"><i class="fas fa-heartbeat"></i> Server Health</div>
-                <div class="progress-wrap"><div class="progress-label"><span>CPU</span><span class="progress-val" id="cpuPercent" style="color:var(--neon-gold);">0%</span></div><div class="progress-bar"><div class="progress-fill cpu" id="cpuBar"></div></div></div>
-                <div class="progress-wrap"><div class="progress-label"><span>Memory</span><span class="progress-val" id="memPercent" style="color:var(--neon-cyan);">0%</span></div><div class="progress-bar"><div class="progress-fill ram" id="memBar"></div></div></div>
-                <div class="progress-wrap"><div class="progress-label"><span>Storage</span><span class="progress-val" id="storagePercent" style="color:#4ade80;">0%</span></div><div class="progress-bar"><div class="progress-fill storage" id="storageBar"></div></div></div>
+            <!-- Server Health -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-heartbeat"></i> Server Health</span>
+                </div>
+                <div class="progress-wrap">
+                    <div class="progress-header">
+                        <span class="progress-label">CPU Usage</span>
+                        <span class="progress-value val-cpu" id="cpuPercent">0%</span>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill fill-cpu" id="cpuBar"></div></div>
+                </div>
+                <div class="progress-wrap">
+                    <div class="progress-header">
+                        <span class="progress-label">Memory</span>
+                        <span class="progress-value val-ram" id="memPercent">0%</span>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill fill-ram" id="memBar"></div></div>
+                </div>
+                <div class="progress-wrap">
+                    <div class="progress-header">
+                        <span class="progress-label">Storage</span>
+                        <span class="progress-value val-storage" id="storagePercent">0%</span>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill fill-storage" id="storageBar"></div></div>
+                </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
-                <div class="glass-card">
-                    <div class="card-title"><i class="fas fa-tags" style="color:var(--neon-purple);"></i> World Categories</div>
-                    <div class="cat-grid">
-                        <div class="cat-box"><span class="cat-tag tag-starts">STARTS</span><div class="cat-count green" id="startsWorlds">0</div></div>
-                        <div class="cat-box"><span class="cat-tag tag-bfg">BFG</span><div class="cat-count purple" id="bfgWorlds">0</div></div>
-                        <div class="cat-box"><span class="cat-tag tag-shop">SHOP</span><div class="cat-count yellow" id="shopWorlds">0</div></div>
+            <!-- Dual Grid: Categories + Chart -->
+            <div class="dual-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fas fa-tags" style="color:var(--neon-purple);"></i> World Categories</span>
+                    </div>
+                    <div class="cat-row">
+                        <div class="cat-tile">
+                            <span class="cat-badge badge-starts">STARTS</span>
+                            <div class="cat-number green" id="startsWorlds">0</div>
+                        </div>
+                        <div class="cat-tile">
+                            <span class="cat-badge badge-bfg">BFG</span>
+                            <div class="cat-number purple" id="bfgWorlds">0</div>
+                        </div>
+                        <div class="cat-tile">
+                            <span class="cat-badge badge-shop">SHOP</span>
+                            <div class="cat-number gold" id="shopWorlds">0</div>
+                        </div>
                     </div>
                 </div>
-                <div class="glass-card">
-                    <div class="card-title"><i class="fas fa-chart-line" style="color:#4ade80;"></i> 24h Activity</div>
-                    <div class="chart-wrap" style="height:180px;"><canvas id="worldChart"></canvas></div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fas fa-chart-line" style="color:var(--neon-green);"></i> 24h Activity</span>
+                    </div>
+                    <div class="chart-container"><canvas id="worldChart"></canvas></div>
                 </div>
             </div>
 
-            <div class="glass-card">
-                <div class="card-title"><i class="fas fa-globe" style="color:var(--neon-cyan);"></i> Worlds Online</div>
-                <div class="world-stats-row">
+            <!-- Worlds Online -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-globe" style="color:var(--neon-cyan);"></i> Worlds Online</span>
+                </div>
+                <div class="worlds-stats-row">
                     <div class="world-stat-pill">Active: <span id="activeWorldsCount">0</span></div>
                     <div class="world-stat-pill">Empty: <span id="emptyWorldsCount">0</span></div>
                     <div class="world-stat-pill">Total: <span id="totalWorldsCount">0</span></div>
                 </div>
                 <div class="worlds-grid" id="worldsContainer">
-                    <div class="world-card" style="background:transparent;border-color:transparent;color:var(--text-faint);">Loading...</div>
+                    <div class="world-tile" style="background:transparent;border-color:transparent;color:var(--text-faint);">Loading...</div>
                 </div>
             </div>
         </div>
 
         <!-- PAGE: INFO -->
         <div class="page" id="page-info">
-            <div class="glass-card">
-                <div class="card-title" style="font-size:28px;"><i class="fas fa-info-circle" style="color:var(--neon-pink);"></i> INFO GTPLAY</div>
-                <p style="font-size:16px;color:var(--text-dim);line-height:1.7;margin-bottom:20px;">Ini adalah <strong style="color:var(--text-primary);">server privat Growtopia</strong> bernama <strong style="color:var(--neon-cyan);">GTPLAY</strong>. Bebas bereksperimen tanpa batasan.</p>
-                <div class="info-highlight" style="background:rgba(0,245,255,0.03);border-left:3px solid var(--neon-cyan);padding:18px 22px;border-radius:16px;margin-bottom:24px;color:var(--text-dim);">
-                    ⚡ Unlimited Gems · Free Items · Custom Worlds · No Ban · No Rules (tapi tetap santuy)
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="font-size:22px;"><i class="fas fa-info-circle" style="color:var(--neon-pink);"></i> INFO GTPLAY</span>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div style="background:rgba(255,255,255,0.02);padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);">🪙 Unlimited DL & WL</div>
-                    <div style="background:rgba(255,255,255,0.02);padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);">🎁 Spawn item langka</div>
-                    <div style="background:rgba(255,255,255,0.02);padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);">🌍 Buat world bebas</div>
-                    <div style="background:rgba(255,255,255,0.02);padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);">🎮 Mode BFG, Start, Parkour</div>
+                <p style="font-size:15px;color:var(--text-secondary);line-height:1.8;margin-bottom:18px;letter-spacing:0.2px;">
+                    Ini adalah <strong style="color:var(--text-primary);">server privat Growtopia</strong> bernama
+                    <strong style="color:var(--neon-cyan);">GTPLAY</strong>. Bebas bereksperimen tanpa batasan.
+                </p>
+                <div style="background:rgba(0,229,255,0.04);border-left:3px solid var(--neon-cyan);padding:18px 22px;border-radius:var(--radius-md);margin-bottom:22px;color:var(--text-secondary);font-size:14px;letter-spacing:0.3px;line-height:1.6;">
+                    ⚡ Unlimited Gems · Free Items · Custom Worlds · No Ban · No Rules
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+                    <div style="background:rgba(255,255,255,0.03);padding:14px 18px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);font-size:13px;color:var(--text-secondary);transition:all var(--duration-fast) ease;">🪙 Unlimited DL & WL</div>
+                    <div style="background:rgba(255,255,255,0.03);padding:14px 18px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);font-size:13px;color:var(--text-secondary);transition:all var(--duration-fast) ease;">🎁 Spawn item langka</div>
+                    <div style="background:rgba(255,255,255,0.03);padding:14px 18px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);font-size:13px;color:var(--text-secondary);transition:all var(--duration-fast) ease;">🌍 Buat world bebas</div>
+                    <div style="background:rgba(255,255,255,0.03);padding:14px 18px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);font-size:13px;color:var(--text-secondary);transition:all var(--duration-fast) ease;">🎮 Mode BFG, Start, Parkour</div>
                 </div>
             </div>
         </div>
 
         <!-- PAGE: HOST -->
         <div class="page" id="page-host">
-            <div class="glass-card">
-                <div class="card-title"><i class="fas fa-plug" style="color:var(--neon-cyan);"></i> Host Connection</div>
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                    <div class="host-item"><div class="host-info"><i class="fas fa-bolt"></i><span class="host-name">PowerTunnel</span><span class="host-platform">Android</span></div><button class="copy-btn" data-copy-text="https://dash.gtps.cloud/android/6986" data-host-name="PowerTunnel"><i class="far fa-copy"></i> Copy URL</button></div>
-                    <div class="host-item"><div class="host-info"><i class="fab fa-apple"></i><span class="host-name">Surge 5</span><span class="host-platform">iOS</span></div><button class="copy-btn" data-copy-text="https://dash.gtps.cloud/ios/6986" data-host-name="Surge 5"><i class="far fa-copy"></i> Copy URL</button></div>
-                    <div class="host-item"><div class="host-info"><i class="fas fa-network-wired"></i><span class="host-name">Virtual Host</span><span class="host-platform">All</span></div><button class="copy-btn" data-copy-text="91.134.85.13 growtopia1.com&#10;91.134.85.13 growtopia2.com&#10;91.134.85.13 www.growtopia1.com&#10;91.134.85.13 www.growtopia2.com" data-host-name="Virtual Host"><i class="far fa-copy"></i> Copy</button></div>
-                    <div class="host-item"><div class="host-info"><i class="fab fa-windows"></i><span class="host-name">Windows Hosts</span><span class="host-platform">PC</span></div><button class="copy-btn" data-copy-text="91.134.85.13 growtopia1.com&#10;91.134.85.13 growtopia2.com&#10;91.134.85.13 www.growtopia1.com&#10;91.134.85.13 www.growtopia2.com" data-host-name="Windows Hosts"><i class="far fa-copy"></i> Copy</button></div>
-                    <div class="host-item"><div class="host-info"><i class="fas fa-download" style="color:var(--neon-pink);"></i><span class="host-name">GTPLAY Custom APK</span><span class="host-platform">Android</span></div><a href="https://www.mediafire.com/file/jtawd7smd92nnsx/GTPLAY.apk/file" target="_blank" class="download-btn"><i class="fas fa-download"></i> Download</a></div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-plug" style="color:var(--neon-cyan);"></i> Host Connection</span>
                 </div>
-                <div style="margin-top:18px;padding:12px 16px;background:rgba(0,245,255,0.02);border-radius:12px;border-left:3px solid var(--neon-cyan);font-size:13px;color:var(--text-dim);">Alternatif: Gunakan Growsoft untuk otomatis setting hosts.</div>
+                <div class="host-list">
+                    <div class="host-row">
+                        <div class="host-row-left"><i class="fas fa-bolt"></i><span class="host-row-name">PowerTunnel</span><span class="host-row-platform">Android</span></div>
+                        <button class="btn-copy" data-copy-text="https://dash.gtps.cloud/android/6986" data-host-name="PowerTunnel"><i class="far fa-copy"></i> Copy URL</button>
+                    </div>
+                    <div class="host-row">
+                        <div class="host-row-left"><i class="fab fa-apple"></i><span class="host-row-name">Surge 5</span><span class="host-row-platform">iOS</span></div>
+                        <button class="btn-copy" data-copy-text="https://dash.gtps.cloud/ios/6986" data-host-name="Surge 5"><i class="far fa-copy"></i> Copy URL</button>
+                    </div>
+                    <div class="host-row">
+                        <div class="host-row-left"><i class="fas fa-network-wired"></i><span class="host-row-name">Virtual Host</span><span class="host-row-platform">All</span></div>
+                        <button class="btn-copy" data-copy-text="91.134.85.13 growtopia1.com&#10;91.134.85.13 growtopia2.com&#10;91.134.85.13 www.growtopia1.com&#10;91.134.85.13 www.growtopia2.com" data-host-name="Virtual Host"><i class="far fa-copy"></i> Copy</button>
+                    </div>
+                    <div class="host-row">
+                        <div class="host-row-left"><i class="fab fa-windows"></i><span class="host-row-name">Windows Hosts</span><span class="host-row-platform">PC</span></div>
+                        <button class="btn-copy" data-copy-text="91.134.85.13 growtopia1.com&#10;91.134.85.13 growtopia2.com&#10;91.134.85.13 www.growtopia1.com&#10;91.134.85.13 www.growtopia2.com" data-host-name="Windows Hosts"><i class="far fa-copy"></i> Copy</button>
+                    </div>
+                    <div class="host-row">
+                        <div class="host-row-left"><i class="fas fa-download" style="color:var(--neon-pink);"></i><span class="host-row-name">GTPLAY Custom APK</span><span class="host-row-platform">Android</span></div>
+                        <a href="https://www.mediafire.com/file/jtawd7smd92nnsx/GTPLAY.apk/file" target="_blank" class="btn-download"><i class="fas fa-download"></i> Download</a>
+                    </div>
+                </div>
+                <div style="margin-top:16px;padding:12px 16px;background:rgba(0,229,255,0.03);border-radius:var(--radius-sm);border-left:3px solid var(--neon-cyan);font-size:12px;color:var(--text-tertiary);letter-spacing:0.3px;">
+                    <i class="fas fa-lightbulb" style="color:var(--neon-gold);margin-right:6px;"></i> Alternatif: Gunakan Growsoft untuk setting hosts otomatis.
+                </div>
             </div>
         </div>
 
         <!-- PAGE: HOW TO PLAY -->
         <div class="page" id="page-howtoplay">
-            <div class="glass-card">
-                <div class="card-title" style="font-size:26px;"><i class="fas fa-gamepad" style="color:var(--neon-gold);"></i> How to Play</div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="font-size:22px;"><i class="fas fa-gamepad" style="color:var(--neon-gold);"></i> How to Play</span>
+                </div>
                 <div class="how-grid">
-                    <div class="how-card"><h3 style="color:#4ade80;"><i class="fab fa-android"></i> Android</h3><ul class="step-list"><li>Gunakan PowerTunnel / Custom APK</li><li>Copy URL: <span class="inline-copy" onclick="copyText('https://dash.gtps.cloud/android/6986')"><i class="far fa-copy"></i> Copy</span></li><li>Tempel di PowerTunnel → Aktifkan</li><li>Buka Growtopia</li></ul></div>
-                    <div class="how-card"><h3 style="color:#9ca3af;"><i class="fab fa-apple"></i> iOS</h3><ul class="step-list"><li>Install Surge 5</li><li>Copy URL: <span class="inline-copy" onclick="copyText('https://dash.gtps.cloud/ios/6986')"><i class="far fa-copy"></i> Copy</span></li><li>Import Profile from URL</li><li>Aktifkan VPN → Buka Growtopia</li></ul></div>
-                    <div class="how-card"><h3 style="color:#60a5fa;"><i class="fab fa-windows"></i> Windows</h3><ul class="step-list"><li>Buka Notepad sebagai Admin</li><li>Buka hosts file</li><li>Copy: <span class="inline-copy" onclick="copyText('91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com')"><i class="far fa-copy"></i> Copy</span></li><li>Tempel & simpan</li></ul></div>
-                    <div class="how-card"><h3 style="color:var(--neon-purple);"><i class="fas fa-network-wired"></i> Virtual Host</h3><ul class="step-list"><li>Install Virtual Host</li><li>Copy: <span class="inline-copy" onclick="copyText('91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com')"><i class="far fa-copy"></i> Copy</span></li><li>Tempel & aktifkan</li></ul></div>
+                    <div class="how-card">
+                        <h4 style="color:#4ade80;"><i class="fab fa-android"></i> Android</h4>
+                        <ul>
+                            <li>Gunakan PowerTunnel / Custom APK</li>
+                            <li>Copy URL: <span class="inline-copy" onclick="copyToClipboard('https://dash.gtps.cloud/android/6986','PowerTunnel URL')"><i class="far fa-copy"></i> Copy</span></li>
+                            <li>Tempel di PowerTunnel → Aktifkan</li>
+                            <li>Buka Growtopia</li>
+                        </ul>
+                    </div>
+                    <div class="how-card">
+                        <h4 style="color:#9ca3af;"><i class="fab fa-apple"></i> iOS</h4>
+                        <ul>
+                            <li>Install Surge 5</li>
+                            <li>Copy URL: <span class="inline-copy" onclick="copyToClipboard('https://dash.gtps.cloud/ios/6986','Surge 5 URL')"><i class="far fa-copy"></i> Copy</span></li>
+                            <li>Import Profile from URL</li>
+                            <li>Aktifkan VPN → Buka Growtopia</li>
+                        </ul>
+                    </div>
+                    <div class="how-card">
+                        <h4 style="color:#60a5fa;"><i class="fab fa-windows"></i> Windows</h4>
+                        <ul>
+                            <li>Buka Notepad sebagai Admin</li>
+                            <li>Buka hosts file</li>
+                            <li>Copy: <span class="inline-copy" onclick="copyToClipboard('91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com','Hosts Config')"><i class="far fa-copy"></i> Copy</span></li>
+                            <li>Tempel & simpan</li>
+                        </ul>
+                    </div>
+                    <div class="how-card">
+                        <h4 style="color:var(--neon-purple);"><i class="fas fa-network-wired"></i> Virtual Host</h4>
+                        <ul>
+                            <li>Install Virtual Host</li>
+                            <li>Copy: <span class="inline-copy" onclick="copyToClipboard('91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com','Virtual Host Config')"><i class="far fa-copy"></i> Copy</span></li>
+                            <li>Tempel & aktifkan</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- PAGE: SEARCH -->
         <div class="page" id="page-search">
-            <div class="glass-card">
-                <div class="card-title"><i class="fas fa-search" style="color:var(--neon-cyan);"></i> Search Item</div>
-                <p style="color:var(--text-dim);margin-bottom:16px;">Cari texture item berdasarkan ID (Server: 6986).</p>
-                <div class="search-container">
-                    <input type="text" class="search-input" id="itemIdInput" placeholder="Masukkan ID (contoh: 2, 18, 242)">
-                    <button class="search-btn" id="searchItemBtn"><i class="fas fa-search"></i> SEARCH</button>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-search" style="color:var(--neon-cyan);"></i> Search Item Texture</span>
                 </div>
-                <div class="item-result" id="itemResult" style="display:none;">
-                    <div style="position:relative;display:inline-block;border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);">
-                        <img id="itemImage" src="" alt="Item" style="display:block;max-width:300px;height:auto;pointer-events:none;">
+                <p style="color:var(--text-tertiary);margin-bottom:16px;font-size:13px;letter-spacing:0.3px;">Cari texture item berdasarkan ID (Server: 6986).</p>
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" id="itemIdInput" placeholder="Masukkan ID (contoh: 2, 18, 242)" autocomplete="off">
+                    <button class="btn-search" id="searchItemBtn"><i class="fas fa-search"></i> SEARCH</button>
+                </div>
+                <div id="itemResult" style="display:none;margin-top:16px;">
+                    <div style="position:relative;display:inline-block;border-radius:var(--radius-md);overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);">
+                        <img id="itemImage" src="" alt="Item" style="display:block;max-width:280px;height:auto;pointer-events:none;">
                     </div>
-                    <button class="download-item-btn" id="downloadItemBtn" style="display:none;margin-top:16px;padding:10px 24px;background:rgba(0,245,255,0.05);border:1px solid var(--neon-cyan);border-radius:40px;color:var(--neon-cyan);cursor:pointer;transition:all 0.2s;"><i class="fas fa-download"></i> Download</button>
-                    <p id="itemError" style="color:#ff4d4d;margin-top:12px;display:none;"></p>
+                    <button id="downloadItemBtn" style="display:none;margin-top:14px;padding:10px 22px;background:rgba(0,229,255,0.06);border:1px solid var(--neon-cyan);border-radius:var(--radius-full);color:var(--neon-cyan);cursor:pointer;transition:all var(--duration-fast) ease;font-family:var(--font-body);font-weight:600;font-size:12px;letter-spacing:0.3px;">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <p id="itemError" style="color:var(--neon-red);margin-top:12px;display:none;font-size:13px;"></p>
                 </div>
             </div>
         </div>
 
         <!-- PAGE: EVENT -->
         <div class="page" id="page-event">
-            <div class="glass-card">
-                <div class="card-title" style="font-size:26px;"><i class="fas fa-calendar-alt" style="color:var(--neon-pink);"></i> Events</div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="font-size:22px;"><i class="fas fa-calendar-alt" style="color:var(--neon-pink);"></i> Events</span>
+                </div>
                 <div class="event-grid">
-                    <div class="event-card"><h4>🏆 Tournament BFG</h4><p>Turnamen mingguan hadiah DL hingga 500.</p><span class="event-tag">MINGGU INI</span></div>
-                    <div class="event-card"><h4>🎉 Giveaway Langka</h4><p>Phoenix Wings, Rainbow Carpet, dll.</p><span class="event-tag">SETIAP HARI</span></div>
-                    <div class="event-card"><h4>🧟 Zombie Survival</h4><p>Mode bertahan hidup di world khusus.</p><span class="event-tag">MINGGU DEPAN</span></div>
-                    <div class="event-card"><h4>💎 Casino Night</h4><p>Mainkan game casino dengan chips gratis.</p><span class="event-tag">JUMAT</span></div>
-                    <div class="event-card"><h4>🎨 Custom World Contest</h4><p>Lomba desain world, hadiah spesial.</p><span class="event-tag">BULAN INI</span></div>
-                    <div class="event-card"><h4>🤝 Community Meetup</h4><p>Ngobrol bareng admin & mod.</p><span class="event-tag">SABTU</span></div>
+                    <div class="event-card"><h5>🏆 Tournament BFG</h5><p>Turnamen mingguan hadiah DL hingga 500.</p><span class="event-tag">MINGGU INI</span></div>
+                    <div class="event-card"><h5>🎉 Giveaway Langka</h5><p>Phoenix Wings, Rainbow Carpet, dll.</p><span class="event-tag">SETIAP HARI</span></div>
+                    <div class="event-card"><h5>🧟 Zombie Survival</h5><p>Mode bertahan hidup di world khusus.</p><span class="event-tag">MINGGU DEPAN</span></div>
+                    <div class="event-card"><h5>💎 Casino Night</h5><p>Mainkan game casino dengan chips gratis.</p><span class="event-tag">JUMAT</span></div>
+                    <div class="event-card"><h5>🎨 Custom World Contest</h5><p>Lomba desain world, hadiah spesial.</p><span class="event-tag">BULAN INI</span></div>
+                    <div class="event-card"><h5>🤝 Community Meetup</h5><p>Ngobrol bareng admin & mod.</p><span class="event-tag">SABTU</span></div>
                 </div>
             </div>
         </div>
 
         <!-- PAGE: COMMUNITY -->
         <div class="page" id="page-community">
-            <div class="glass-card" style="text-align:center;">
-                <div class="card-title" style="justify-content:center;font-size:26px;"><i class="fas fa-users" style="color:var(--neon-cyan);"></i> Community</div>
-                <p style="color:var(--text-dim);max-width:500px;margin:0 auto 24px;">Gabung komunitas GTPLAY untuk info event, cari teman, dan pamer hasil!</p>
-                <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;">
-                    <a href="#" class="community-btn discord"><i class="fab fa-discord"></i> Discord</a>
-                    <a href="#" class="community-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <div class="card" style="text-align:center;">
+                <div class="card-header" style="justify-content:center;">
+                    <span class="card-title" style="font-size:22px;"><i class="fas fa-users" style="color:var(--neon-cyan);"></i> Community</span>
                 </div>
-                <div style="margin-top:24px;padding:12px;background:rgba(0,245,255,0.02);border-radius:12px;border-left:3px solid var(--neon-cyan);color:var(--text-faint);font-size:13px;"><i class="fas fa-bullhorn"></i> Link invite akan segera diumumkan.</div>
+                <p style="color:var(--text-tertiary);max-width:500px;margin:0 auto 22px;font-size:14px;letter-spacing:0.3px;line-height:1.6;">Gabung komunitas GTPLAY untuk info event, cari teman, dan pamer hasil!</p>
+                <div class="community-btns">
+                    <a href="#" class="btn-community btn-discord" onclick="event.preventDefault();showToast('Discord invite coming soon')"><i class="fab fa-discord"></i> Discord</a>
+                    <a href="#" class="btn-community btn-whatsapp" onclick="event.preventDefault();showToast('WhatsApp invite coming soon')"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                </div>
+                <div style="margin-top:22px;padding:12px;background:rgba(0,229,255,0.03);border-radius:var(--radius-sm);border-left:3px solid var(--neon-cyan);color:var(--text-faint);font-size:12px;letter-spacing:0.3px;">
+                    <i class="fas fa-bullhorn" style="margin-right:6px;"></i> Link invite akan segera diumumkan.
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="toastCopy" class="toast"></div>
+    <!-- Toast -->
+    <div id="toastCopy" class="toast"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
 
     <script>
         (function() {
-            // ===== BURGER =====
-            const burgerBtn = document.getElementById('burgerBtn'),
-                burgerMenu = document.getElementById('burgerMenu'),
-                burgerOverlay = document.getElementById('burgerOverlay');
-
-            window.toggleBurger = function() {
-                const o = burgerMenu.classList.toggle('open');
-                burgerBtn.classList.toggle('open', o);
-                burgerOverlay.classList.toggle('open', o);
+            // ============ NAVIGATION ============
+            const pages = ['home', 'info', 'host', 'howtoplay', 'search', 'event', 'community'];
+            const pageIcons = {
+                home: 'fa-server',
+                info: 'fa-info-circle',
+                host: 'fa-plug',
+                howtoplay: 'fa-gamepad',
+                search: 'fa-search',
+                event: 'fa-calendar-alt',
+                community: 'fa-users'
             };
-            window.closeBurger = function() {
-                burgerMenu.classList.remove('open');
-                burgerBtn.classList.remove('open');
-                burgerOverlay.classList.remove('open');
+            const pageTitles = {
+                home: 'Dashboard',
+                info: 'Info',
+                host: 'Host',
+                howtoplay: 'How to Play',
+                search: 'Search Item',
+                event: 'Events',
+                community: 'Community'
             };
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBurger(); });
 
-            // ===== NAVIGATION =====
-            const allPages = ['home', 'info', 'host', 'howtoplay', 'search', 'event', 'community'];
-            const navMap = { home: 'nav-home', info: 'nav-info', host: 'nav-host', howtoplay: 'nav-howtoplay',
-                search: 'nav-search', event: 'nav-event', community: 'nav-community' };
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            window.navTo = function(p) {
-                closeBurger();
-                allPages.forEach(i => document.getElementById('page-' + i)?.classList.remove('active'));
-                document.getElementById('page-' + p)?.classList.add('active');
-                for (const [k, id] of Object.entries(navMap)) {
-                    const item = document.getElementById(id);
-                    if (item) { item.classList.toggle('active', k === p); }
+            window.navigateTo = function(page) {
+                // Close mobile sidebar
+                closeMobileSidebar();
+                // Hide all pages
+                pages.forEach(p => {
+                    document.getElementById('page-' + p)?.classList.remove('active');
+                });
+                // Show target page
+                const targetPage = document.getElementById('page-' + page);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                    targetPage.style.animation = 'none';
+                    void targetPage.offsetWidth; // reflow
+                    targetPage.style.animation = '';
                 }
-                if (p === 'home' && window.dashboardChart) {
-                    setTimeout(() => { if (window.dashboardChart && window.dashboardChart.canvas) window
-                            .dashboardChart.resize(); }, 200);
+                // Update nav items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.page === page);
+                });
+                // Update topbar
+                document.getElementById('topbarTitle').textContent = pageTitles[page] || 'Dashboard';
+                document.getElementById('topbarIcon').className = 'fas ' + (pageIcons[page] || 'fa-server') + ' page-icon';
+                // Scroll to top
+                document.getElementById('mainContent').scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Resize chart if on home
+                if (page === 'home' && window.dashboardChart && window.dashboardChart.canvas) {
+                    setTimeout(() => {
+                        window.dashboardChart.resize();
+                    }, 350);
                 }
             };
-            document.getElementById('logoHomeBtn')?.addEventListener('click', () => navTo('home'));
 
-            // ===== TOAST =====
+            window.toggleMobileSidebar = function() {
+                sidebar.classList.toggle('mobile-open');
+                sidebarOverlay.classList.toggle('active');
+            };
+
+            function closeMobileSidebar() {
+                sidebar.classList.remove('mobile-open');
+                sidebarOverlay.classList.remove('active');
+            }
+            sidebarOverlay.addEventListener('click', closeMobileSidebar);
+
+            // ============ TOAST ============
             const toastEl = document.getElementById('toastCopy');
+            const toastText = document.getElementById('toastText');
 
-            function showToast(msg) {
-                toastEl.textContent = msg;
+            window.showToast = function(msg) {
+                toastText.textContent = msg;
                 toastEl.classList.add('show');
                 clearTimeout(toastEl._timer);
                 toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 2200);
-            }
+            };
 
-            async function copyToClipboard(text, name) {
+            window.copyToClipboard = async function(text, name) {
                 try {
                     await navigator.clipboard.writeText(text);
-                    showToast(name + ' copied');
+                    showToast(name + ' copied!');
                 } catch {
                     const ta = document.createElement('textarea');
                     ta.value = text;
@@ -1392,22 +1779,21 @@
                     ta.select();
                     document.execCommand('copy');
                     document.body.removeChild(ta);
-                    showToast(name + ' copied');
+                    showToast(name + ' copied!');
                 }
-            }
+            };
 
+            // Copy button delegation
             document.body.addEventListener('click', (e) => {
-                const btn = e.target.closest('.copy-btn');
+                const btn = e.target.closest('.btn-copy');
                 if (btn) {
-                    const txt = btn.getAttribute('data-copy-text'),
-                        name = btn.getAttribute('data-host-name') || 'Host';
+                    const txt = btn.getAttribute('data-copy-text');
+                    const name = btn.getAttribute('data-host-name') || 'Config';
                     if (txt) copyToClipboard(txt, name);
                 }
             });
-            window.copyText = function(text) { copyToClipboard(text, 'Config'); };
 
-            // ===== DASHBOARD API =====
-            const SERVER_ID = '6986';
+            // ============ API DATA ============
             const API_MAIN = 'https://api.gtps.cloud/api/server/public/6986';
             const API_STATUS = 'https://api.gtps.cloud/g-api/58549/status';
             const API_WORLDS = 'https://api.gtps.cloud/g-api/58549/worlds';
@@ -1415,13 +1801,15 @@
             async function fetchJSON(url) {
                 try {
                     const res = await fetch(url);
-                    if (!res.ok) throw new Error();
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
                     return await res.json();
-                } catch { return null; }
+                } catch {
+                    return null;
+                }
             }
 
             function getCategory(name) {
-                const u = name.toUpperCase();
+                const u = (name || '').toUpperCase();
                 if (u.startsWith('START')) return 'STARTS';
                 if (u.includes('BFG')) return 'BFG';
                 if (u.includes('SHOP') || u.includes('BUY') || u.includes('STORE')) return 'SHOP';
@@ -1431,15 +1819,17 @@
             function updateChart(activeWorlds) {
                 const ctx = document.getElementById('worldChart')?.getContext('2d');
                 if (!ctx) return;
-                const labels = [],
-                    data = [];
+                const labels = [];
+                const data = [];
                 const now = new Date();
                 for (let i = 23; i >= 0; i--) {
                     const d = new Date(now.getTime() - i * 3600000);
                     labels.push(d.getHours() + ':00');
-                    if (i === 0) data.push(activeWorlds);
-                    else {
-                        let val = Math.max(1, Math.min(50, activeWorlds + (Math.random() * 6 - 3)));
+                    if (i === 0) {
+                        data.push(Math.max(0, Math.round(activeWorlds)));
+                    } else {
+                        const variance = Math.random() * 8 - 4;
+                        const val = Math.max(1, Math.min(60, activeWorlds + variance));
                         data.push(Math.round(val));
                     }
                 }
@@ -1451,13 +1841,13 @@
                         datasets: [{
                             label: 'Active Worlds',
                             data,
-                            borderColor: '#00f5ff',
-                            backgroundColor: 'rgba(0,245,255,0.03)',
+                            borderColor: '#00e5ff',
+                            backgroundColor: 'rgba(0,229,255,0.05)',
                             borderWidth: 2,
-                            tension: 0.4,
+                            tension: 0.45,
                             fill: true,
-                            pointBackgroundColor: '#00f5ff',
-                            pointBorderColor: '#07060b',
+                            pointBackgroundColor: '#00e5ff',
+                            pointBorderColor: '#07070b',
                             pointRadius: 3,
                             pointHoverRadius: 6
                         }]
@@ -1467,18 +1857,18 @@
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
                         scales: {
-                            x: { grid: { display: false }, ticks: { color: '#5a5a72', maxRotation: 40,
-                                    font: { size: 9 } } },
-                            y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#5a5a72',
-                                    stepSize: 10 } }
+                            x: { grid: { display: false }, ticks: { color: '#4a4a60', font: { size: 9 },
+                                    maxRotation: 40 } },
+                            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#4a4a60',
+                                    stepSize: 10, font: { size: 9 } } }
                         }
                     }
                 });
             }
 
             async function updateDashboard() {
-                const [main, status, worldsData] = await Promise.all([fetchJSON(API_MAIN), fetchJSON(API_STATUS),
-                    fetchJSON(API_WORLDS)
+                const [main, status, worldsData] = await Promise.all([
+                    fetchJSON(API_MAIN), fetchJSON(API_STATUS), fetchJSON(API_WORLDS)
                 ]);
 
                 let serverName = 'GTPLAY',
@@ -1496,11 +1886,11 @@
                 if (main?.state) {
                     isOnline = main.state.server_status === 1;
                     playersOnline = main.state.players_online || 0;
-                    const cpu = main.state.cpu_usage || 0,
-                        mem = main.state.memory_usage || 0,
-                        storage = main.state.storage_usage || 0;
+                    const cpu = main.state.cpu_usage || 0;
+                    const mem = main.state.memory_usage || 0;
+                    const storage = main.state.storage_usage || 0;
                     document.getElementById('cpuUsage').innerHTML = cpu.toFixed(1) + '%';
-                    document.getElementById('memoryUsage').innerHTML = mem + ' MB';
+                    document.getElementById('memoryUsage').innerHTML = Math.round(mem) + ' MB';
                     document.getElementById('storageUsage').innerHTML = Math.round(storage) + ' MB';
                     document.getElementById('cpuPercent').innerHTML = cpu.toFixed(1) + '%';
                     document.getElementById('cpuBar').style.width = Math.min(100, cpu) + '%';
@@ -1515,19 +1905,28 @@
                     if (status.server_status === 'online' || status.server_status === 1) isOnline = true;
                     if (status.players_online) playersOnline = status.players_online;
                 }
+
+                // Update status UI
                 const statusDiv = document.getElementById('statusContainer');
                 const statusText = document.getElementById('statusText');
                 const playerSpan = document.getElementById('playerCount');
+                const sideDot = document.getElementById('sidebarStatusDot');
+                const sideText = document.getElementById('sidebarStatusText');
                 if (isOnline) {
-                    statusDiv.className = 'status-badge status-online';
+                    statusDiv.className = 'hero-status online';
                     statusText.innerText = 'ONLINE';
-                    playerSpan.innerText = '(' + playersOnline + ')';
+                    playerSpan.innerText = '(' + playersOnline + ' players)';
+                    sideDot.className = 'status-dot';
+                    sideText.textContent = 'ONLINE · ' + playersOnline + ' players';
                 } else {
-                    statusDiv.className = 'status-badge status-offline';
+                    statusDiv.className = 'hero-status offline';
                     statusText.innerText = 'OFFLINE';
                     playerSpan.innerText = '';
+                    sideDot.className = 'status-dot offline';
+                    sideText.textContent = 'OFFLINE';
                 }
 
+                // Worlds data
                 if (worldsData?.worlds) {
                     const worlds = worldsData.worlds;
                     document.getElementById('totalWorldsCount').innerHTML = worlds.length;
@@ -1547,21 +1946,26 @@
                     document.getElementById('activeWorldsCount').innerHTML = active;
                     document.getElementById('emptyWorldsCount').innerHTML = worlds.length - active;
                     let html = '';
-                    worlds.slice(0, 30).forEach(w => {
+                    worlds.slice(0, 40).forEach(w => {
                         const cat = getCategory(w.name);
+                        const safeName = w.name.replace(/'/g, "\\'");
                         html +=
-                            `<div class="world-card" onclick="alert('World: ${w.name.replace(/'/g,"\\\'")}\\nPlayers: ${w.players||0}')"><div class="world-name">${w.name}</div><span class="world-cat-tag">${cat}</span></div>`;
+                            `<div class="world-tile" onclick="showToast('${safeName} · ${w.players||0} players')"><div class="world-name">${w.name}</div><span class="world-tag">${cat}</span></div>`;
                     });
                     if (html) document.getElementById('worldsContainer').innerHTML = html;
                     updateChart(active);
                 }
+
                 document.getElementById('lastUpdate').innerHTML = new Date().toLocaleTimeString('en-US', { hour12: false });
             }
 
-            // ===== SEARCH ITEM =====
+            // ============ SEARCH ITEM ============
             document.getElementById('searchItemBtn').addEventListener('click', async () => {
                 const itemId = document.getElementById('itemIdInput').value.trim();
-                if (!itemId) return showToast('Masukkan Item ID');
+                if (!itemId) {
+                    showToast('Masukkan Item ID');
+                    return;
+                }
                 const resultDiv = document.getElementById('itemResult');
                 const img = document.getElementById('itemImage');
                 const downloadBtn = document.getElementById('downloadItemBtn');
@@ -1570,6 +1974,7 @@
                 img.style.display = 'none';
                 downloadBtn.style.display = 'none';
                 resultDiv.style.display = 'block';
+                showToast('Mencari item...');
                 const imgUrl = `https://api.gtps.cloud/api/item/texture/6986/${itemId}`;
                 try {
                     const resp = await fetch(imgUrl);
@@ -1586,18 +1991,35 @@
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
+                        showToast('Downloading item_' + itemId + '.png');
                     };
-                } catch (e) {
+                    showToast('Item ditemukan!');
+                } catch {
                     errorEl.style.display = 'block';
                     errorEl.textContent = 'Gagal memuat item. Pastikan ID benar.';
+                    showToast('Item tidak ditemukan');
                 }
             });
 
-            // ===== INIT =====
+            // Enter key on search
+            document.getElementById('itemIdInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('searchItemBtn').click();
+            });
+
+            // ============ REFRESH ============
+            window.refreshData = function() {
+                showToast('Refreshing...');
+                updateDashboard();
+            };
+
+            // ============ INIT ============
             updateDashboard();
             setInterval(updateDashboard, 8000);
-            document.getElementById('nav-home')?.classList.add('active');
-            document.getElementById('page-home')?.classList.add('active');
+
+            // Initial sidebar status
+            document.querySelector('.nav-item[data-page="home"]').classList.add('active');
+            document.getElementById('topbarTitle').textContent = 'Dashboard';
+            document.getElementById('topbarIcon').className = 'fas fa-server page-icon';
         })();
     </script>
 </body>
