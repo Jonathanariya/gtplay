@@ -1,993 +1,790 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>GTPLAY · Dashboard</title>
-    
-    <!-- Tailwind + Fonts -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <title>GTPLAY - Private Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Chart.js untuk grafik -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
     <style>
-        * { font-family: 'Inter', sans-serif; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg: #0a0a0a;
+            --surface: #121212;
+            --surface2: #1c1c1c;
+            --surface3: #262626;
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #b0b0b0;
+            --text: #f0f0f0;
+            --text-dim: #a8a8b0;
+            --text-faint: #707070;
+            --success: #4ade80;
+            --cpu: #fbbf24;
+            --ram: #60a5fa;
+            --storage: #4ade80;
+            --purple: #c084fc;
+            --yellow: #fbbf24;
+        }
         body {
-            background: #0a0a0c;
-            background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 30px 30px;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        
-        /* Glass cards - dark mode total */
-        .glass-card {
-            background: #121215;
-            border: 1px solid #22222a;
-            border-radius: 1rem;
-            transition: all 0.2s ease;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 40% at 20% 30%, rgba(176, 176, 176, 0.04) 0%, transparent 60%), radial-gradient(ellipse 50% 30% at 80% 70%, rgba(176, 176, 176, 0.02) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
         }
-        
-        .glass-card:hover {
-            border-color: #3a3a45;
+        .noise {
+            position: fixed;
+            inset: 0;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+            z-index: 0;
         }
-        
-        /* Status badges */
-        .badge-online {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #4ade80;
+        #app {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        
-        .badge-offline {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
-        
-        /* Host buttons */
-        .host-item {
-            background: #1a1a20;
-            border: 1px solid #2a2a33;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
+
+        /* TOPBAR */
+        .topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.2s;
+            padding: 12px 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
-        .host-item:hover {
-            background: #22222a;
-            border-color: #40404d;
-        }
-        
-        .copy-btn {
-            background: #25252d;
-            border: 1px solid #35353f;
-            color: #9ca3af;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 500;
+        .topbar-left {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+        }
+        .topbar-logo {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .topbar-logo img {
+            height: 54px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: transform 0.1s ease;
+            border-radius: 8px;
+        }
+        .topbar-logo img:hover {
+            transform: scale(0.98);
+        }
+        .topbar-logo-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .burger-btn {
+            width: 42px;
+            height: 42px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            z-index: 201;
+        }
+        .burger-btn:hover {
+            background: var(--surface3);
+        }
+        .burger-btn.open {
+            background: var(--surface3);
+            border-color: var(--accent);
+        }
+        .burger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text-dim);
+            border-radius: 2px;
             transition: all 0.2s;
         }
-        
-        .copy-btn:hover {
-            background: #2f2f3a;
-            color: white;
-            border-color: #4f4f5f;
+        .burger-btn.open .burger-line:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
         }
-        
-        .download-btn {
-            background: #25252d;
-            border: 1px solid #35353f;
-            color: #9ca3af;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
+        .burger-btn.open .burger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .burger-btn.open .burger-line:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* BURGER MENU */
+        .burger-menu {
+            position: fixed;
+            top: 74px;
+            right: 24px;
+            width: 270px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            overflow: hidden;
+            transform: translateY(-8px) scale(0.96);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .burger-menu.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+        .burger-menu-header {
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .burger-menu-user {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.3px;
+        }
+        .burger-menu-sub {
+            font-size: 11px;
+            color: var(--text-faint);
+            margin-top: 4px;
+        }
+        .burger-nav {
+            padding: 8px 10px;
+        }
+        .burger-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 15px;
             font-weight: 500;
+            color: var(--text-dim);
+        }
+        .burger-nav-item:hover {
+            background: var(--surface3);
+            color: var(--text);
+        }
+        .burger-nav-item.active {
+            background: rgba(176, 176, 176, 0.12);
+            color: var(--accent);
+        }
+        .burger-nav-item .nav-icon {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-faint);
+        }
+        .burger-nav-item .nav-icon i {
+            font-size: 18px;
+        }
+        .burger-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 199;
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(3px);
+        }
+        .burger-overlay.open {
+            display: block;
+        }
+
+        /* PAGE CONTAINER */
+        .page-container {
+            flex: 1;
+            padding: 28px 32px 40px;
+        }
+        .page {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* DASHBOARD CARDS */
+        .dash-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px 22px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+        .dash-card:hover { border-color: rgba(255,255,255,0.18); }
+        .dash-card h2 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #f0f0f0, #b0b0b0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .dash-card h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .dash-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .dash-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .dash-header-left i {
+            font-size: 26px;
+            color: var(--text-faint);
+        }
+        .dash-header-info h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        .dash-header-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .badge-id {
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 4px 14px;
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--text-faint);
+            letter-spacing: 0.5px;
+        }
+        .badge-ip {
+            font-size: 11px;
+            color: var(--text-faint);
+            font-family: monospace;
+        }
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        
-        .download-btn:hover {
-            background: #2f2f3a;
-            color: white;
-            border-color: #4f4f5f;
-        }
-        
-        /* World cards */
-        .world-card {
-            background: #151518;
-            border: 1px solid #25252d;
-            border-radius: 0.75rem;
-            padding: 0.75rem;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        
-        .world-card:hover {
-            border-color: #40404d;
-            transform: translateY(-2px);
-        }
-        
-        /* Owner & Co-Owner Cards */
-        .owner-card {
-            background: #151518;
-            border: 1px solid #25252d;
-            border-radius: 0.75rem;
-            padding: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: all 0.2s;
-        }
-        
-        .owner-card:hover {
-            border-color: #40404d;
-            background: #1a1a22;
-        }
-        
-        .owner-avatar {
-            width: 40px;
-            height: 40px;
+            gap: 8px;
+            padding: 8px 18px;
             border-radius: 999px;
-            background: linear-gradient(135deg, #2a2a33, #1a1a22);
-            border: 2px solid #3a3a45;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #d1d5db;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
         }
-        
-        .co-owner-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #1f2937, #111827);
-            border: 2px solid #374151;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #9ca3af;
-        }
-        
-        .owner-badge {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-            font-size: 0.65rem;
-            padding: 0.15rem 0.5rem;
-            border-radius: 999px;
-            font-weight: 500;
-        }
-        
-        .co-owner-badge {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            font-size: 0.65rem;
-            padding: 0.15rem 0.5rem;
-            border-radius: 999px;
-            font-weight: 500;
-        }
-        
-        /* Progress Bars */
-        .progress-bar {
-            height: 8px;
-            background: #1f1f27;
-            border-radius: 999px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.3s ease;
-        }
-        
-        /* Animations */
-        .value-update {
-            transition: all 0.3s;
-        }
-        
-        .value-update.changed {
-            transform: scale(1.1);
+        .status-online {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid rgba(34,197,94,0.25);
             color: #4ade80;
         }
-        
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 200px;
+        .status-offline {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.25);
+            color: #f87171;
+        }
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 1.6s infinite;
+        }
+        .status-offline .pulse-dot { background: #f87171; animation: none; }
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(1.25); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .dash-header-footer {
             width: 100%;
-        }
-        
-        /* FAQ Styles */
-        .faq-item {
-            border-bottom: 1px solid #22222a;
-            padding: 1rem 0;
-        }
-        
-        .faq-item:last-child {
-            border-bottom: none;
-        }
-        
-        .faq-question {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            font-weight: 500;
-            color: #e5e7eb;
+            font-size: 11px;
+            color: var(--text-faint);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
         }
-        
-        .faq-question:hover {
-            color: white;
+
+        .metric-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
         }
-        
-        .faq-answer {
-            margin-top: 0.75rem;
-            color: #9ca3af;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            padding-right: 1.5rem;
+        .metric-box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 14px;
+            text-align: center;
+            transition: all 0.2s;
         }
-        
-        .faq-icon {
-            transition: transform 0.3s;
-            color: #6b7280;
+        .metric-box:hover { border-color: rgba(255,255,255,0.2); background: var(--surface3); }
+        .metric-box i { font-size: 22px; margin-bottom: 8px; }
+        .metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-faint); margin-bottom: 4px; }
+        .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+        .metric-cpu { color: var(--cpu); }
+        .metric-ram { color: var(--ram); }
+        .metric-storage { color: var(--storage); }
+
+        .progress-group { margin-bottom: 14px; }
+        .progress-group:last-child { margin-bottom: 0; }
+        .progress-label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; color: var(--text-dim); }
+        .progress-val { font-family: monospace; font-weight: 500; }
+        .progress-bar { height: 7px; background: var(--surface3); border-radius: 999px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+        .progress-fill.cpu { background: var(--cpu); }
+        .progress-fill.ram { background: var(--ram); }
+        .progress-fill.storage { background: var(--storage); }
+
+        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; }
+        .cat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 16px 10px; transition: all 0.2s; }
+        .cat-box:hover { border-color: rgba(255,255,255,0.2); background: var(--surface3); }
+        .cat-tag { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .tag-starts { background: rgba(34,197,94,0.12); color: #4ade80; border:1px solid rgba(34,197,94,0.2); }
+        .tag-bfg { background: rgba(168,85,247,0.12); color: #c084fc; border:1px solid rgba(168,85,247,0.2); }
+        .tag-shop { background: rgba(245,158,11,0.12); color: #fbbf24; border:1px solid rgba(245,158,11,0.2); }
+        .tag-other { background: rgba(107,114,128,0.12); color: #9ca3af; border:1px solid rgba(107,114,128,0.2); }
+        .cat-count { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 800; }
+        .cat-count.green { color: #4ade80; }
+        .cat-count.purple { color: #c084fc; }
+        .cat-count.yellow { color: #fbbf24; }
+
+        .chart-wrap { position: relative; height: 200px; width: 100%; }
+        .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+        .chart-legend { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-faint); margin-top: 6px; padding: 0 4px; }
+
+        .world-stats-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .world-stat-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 5px 14px; font-size: 11px; color: var(--text-dim); }
+        .world-stat-pill span { font-weight: 600; color: var(--text); font-family: monospace; }
+        .worlds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+        .world-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .world-card:hover { border-color: rgba(74,222,128,0.4); background: var(--surface3); }
+        .world-card .world-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .world-cat-tag { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; }
+        .world-skeleton { background: var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px 8px; text-align:center; animation:pulseSkel 1.2s infinite; }
+        .world-skeleton .skel-line { height:10px; background:var(--surface3); border-radius:4px; margin:0 auto 6px; }
+        .world-skeleton .skel-line:first-child { width:70%; }
+        .world-skeleton .skel-line:last-child { width:45%; height:8px; }
+        @keyframes pulseSkel { 0%,100%{opacity:0.5;} 50%{opacity:0.8;} }
+
+        .dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+        .toast-simple { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface); border: 1px solid var(--border); border-radius: 40px; padding: 10px 24px; font-size: 13px; font-weight: 500; color: var(--text); box-shadow: 0 8px 20px rgba(0,0,0,0.4); z-index: 999; transition: transform 0.2s, opacity 0.2s; opacity: 0; pointer-events: none; white-space: normal; word-break: break-word; text-align: center; max-width: 90vw; }
+        .toast-simple.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 32px 28px; backdrop-filter: blur(4px); box-shadow: 0 12px 28px rgba(0,0,0,0.3); }
+        .info-card h2 { font-family: 'Rajdhani',sans-serif; font-size:28px; font-weight:700; margin-bottom:16px; letter-spacing:-0.3px; background:linear-gradient(135deg,#f0f0f0,#b0b0b0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        .info-card p { color: var(--text-dim); line-height:1.5; font-size:16px; margin-bottom:20px; }
+        .info-highlight { background: rgba(176,176,176,0.08); border-left:3px solid var(--accent); padding:14px 18px; border-radius:12px; font-size:14px; color:var(--text); margin-bottom:20px; }
+        .placeholder-list { margin-top:20px; display:flex; flex-direction:column; gap:12px; }
+        .placeholder-item { background:var(--surface2); padding:12px 18px; border-radius:14px; font-size:14px; border:1px solid var(--border); color:var(--text-dim); }
+
+        .host-section { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:24px; backdrop-filter:blur(4px); margin-bottom:28px; }
+        .host-header { display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:18px; }
+        .host-header i { font-size:24px; color:var(--success); }
+        .host-header h2 { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:600; letter-spacing:-0.2px; background:none; -webkit-background-clip:unset; background-clip:unset; color:var(--text); }
+        .host-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+        .host-item:hover { border-color:rgba(255,255,255,0.2); background:var(--surface3); }
+        .host-info { display:flex; align-items:center; gap:10px; }
+        .host-info i, .host-info .custom-icon { font-size:18px; width:24px; text-align:center; color:var(--text-dim); }
+        .host-info .custom-icon-img { width:20px; height:20px; filter:brightness(0) invert(1); object-fit:contain; vertical-align:middle; }
+        .host-name { font-weight:600; color:var(--text); font-size:14px; }
+        .host-platform { font-size:11px; color:var(--text-faint); margin-left:6px; }
+        .host-actions { display:flex; gap:8px; }
+        .copy-btn { background:rgba(255,255,255,0.05); border:1px solid var(--border); padding:6px 12px; border-radius:30px; font-size:12px; font-weight:500; color:var(--text-dim); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s; }
+        .copy-btn:hover { background:rgba(255,255,255,0.1); color:var(--text); border-color:var(--accent); }
+        .download-btn { background:rgba(255,255,255,0.05); border:1px solid var(--border); padding:6px; border-radius:30px; color:var(--text-dim); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; text-decoration:none; width:32px; height:32px; }
+        .download-btn:hover { background:rgba(255,255,255,0.1); color:var(--text); border-color:var(--accent); }
+        .download-btn .btn-text { display:none; }
+        .helper-note { background:rgba(74,222,128,0.08); border-left:3px solid var(--success); padding:12px 16px; border-radius:12px; font-size:13px; margin-top:20px; color:var(--text-dim); }
+
+        .how-card { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:18px; transition:all 0.2s; }
+        .how-card:hover { border-color:rgba(255,255,255,0.2); }
+        .how-card h3 { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:10px; color:var(--text); }
+        .how-card .step-list { list-style:none; padding:0; counter-reset:item; }
+        .how-card .step-list li { color:var(--text-dim); font-size:13px; margin-bottom:8px; padding-left:20px; position:relative; line-height:1.4; }
+        .how-card .step-list li:before { content:counter(item); counter-increment:item; position:absolute; left:0; color:var(--accent); font-weight:600; font-size:12px; }
+        .how-card .inline-copy { background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:20px; padding:3px 8px; font-size:11px; margin-left:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; color:var(--text-dim); }
+        .how-card .inline-copy:hover { background:rgba(255,255,255,0.1); color:var(--text); }
+        .howtoplay-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-top:20px; }
+
+        .community-btn { display:inline-flex; align-items:center; gap:10px; padding:14px 28px; border-radius:40px; font-weight:600; font-size:15px; text-decoration:none; transition:all 0.2s; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+        .community-btn.discord { background:#5865F2; box-shadow:0 8px 20px rgba(88,101,242,0.25); }
+        .community-btn.whatsapp { background:#25D366; box-shadow:0 8px 20px rgba(37,211,102,0.25); }
+        .community-btn:hover { transform:translateY(-2px); }
+        .community-btn.discord:hover { box-shadow:0 12px 28px rgba(88,101,242,0.4); }
+        .community-btn.whatsapp:hover { box-shadow:0 12px 28px rgba(37,211,102,0.4); }
+
+        /* SEARCH ITEM */
+        .search-container { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+        .search-input { flex:1; min-width:200px; background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:12px 18px; font-size:15px; color:var(--text); outline:none; font-family:'Outfit',sans-serif; }
+        .search-input::placeholder { color:var(--text-faint); }
+        .search-btn { background:var(--accent); border:none; border-radius:14px; padding:12px 24px; font-weight:600; font-size:15px; color:#0a0a0a; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px; white-space:nowrap; }
+        .search-btn:hover { filter:brightness(1.2); }
+        .item-result { margin-top:20px; display:none; }
+        .item-result.active { display:block; }
+        .item-img-container { position:relative; display:inline-block; border-radius:4px; overflow:hidden; background:var(--surface2); border:1px solid var(--border); max-width:100%; }
+        .item-img-container img { display:block; width:100%; max-width:450px; height:auto; pointer-events:none; -webkit-user-drag:none; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; -webkit-touch-callout:none; }
+        .anti-leak-overlay { position:absolute; inset:0; background:transparent; z-index:2; }
+        .download-item-btn { margin-top:12px; display:inline-flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:30px; padding:10px 20px; font-weight:500; color:var(--text); cursor:pointer; transition:all 0.2s; }
+        .download-item-btn:hover { background:var(--surface3); border-color:var(--accent); }
+
+        /* EVENT CARDS PERSEGI */
+        .event-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:18px; margin-top:20px; }
+        .event-card { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:20px; transition:all 0.2s; cursor:default; }
+        .event-card:hover { border-color:rgba(255,255,255,0.2); background:var(--surface2); }
+        .event-card h4 { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; margin-bottom:10px; color:var(--text); letter-spacing:-0.2px; }
+        .event-card p { font-size:13px; color:var(--text-dim); line-height:1.5; }
+        .event-card .event-tag { display:inline-block; margin-top:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:999px; padding:4px 12px; font-size:10px; font-weight:600; color:var(--accent); letter-spacing:0.5px; }
+
+        /* RESPONSIVE */
+        @media (max-width:768px) {
+            .topbar { padding:10px 18px; }
+            .topbar-logo img { height:44px; }
+            .topbar-logo-text { font-size:22px; }
+            .burger-menu { right:12px; width:250px; top:68px; }
+            .page-container { padding:14px 12px 24px; }
+            .dash-card { padding:16px 14px; border-radius:14px; margin-bottom:14px; }
+            .dash-card h2 { font-size:17px; }
+            .dash-header-info h1 { font-size:20px; }
+            .dash-header-left i { font-size:22px; }
+            .metric-row { gap:8px; }
+            .metric-box { padding:14px 8px; border-radius:12px; }
+            .metric-box i { font-size:18px; }
+            .metric-value { font-size:22px; }
+            .dash-grid-2 { grid-template-columns:1fr; gap:14px; }
+            .cat-grid { gap:8px; }
+            .cat-box { padding:12px 6px; border-radius:12px; }
+            .cat-count { font-size:22px; }
+            .worlds-grid { grid-template-columns:repeat(auto-fill, minmax(80px,1fr)); gap:6px; }
+            .world-card { padding:8px 6px; border-radius:10px; }
+            .world-name { font-size:10px; }
+            .world-cat-tag { font-size:8px; }
+            .host-section { padding:18px; }
+            .host-item { padding:6px 12px; }
+            .host-info i, .host-info .custom-icon { font-size:16px; width:22px; }
+            .host-name { font-size:13px; }
+            .copy-btn .btn-text { display:none; }
+            .copy-btn { padding:6px 10px; }
+            .copy-btn i { margin:0; }
+            .howtoplay-grid { grid-template-columns:1fr; gap:12px; }
+            .how-card { padding:14px; }
+            .how-card h3 { font-size:16px; }
+            .how-card .step-list li { font-size:12px; margin-bottom:6px; padding-left:18px; }
+            .info-card { padding:20px 18px; border-radius:14px; }
+            .info-card h2 { font-size:22px; }
+            .host-header h2 { font-size:18px; }
+            .helper-note { font-size:12px; }
+            .status-badge { padding:6px 14px; font-size:11px; }
+            .badge-id { padding:3px 10px; font-size:10px; }
+            .community-btn { padding:12px 20px; font-size:14px; }
+            .event-grid { grid-template-columns:1fr; gap:12px; }
+            .search-container { flex-direction:column; }
+            .item-img-container img { max-width:100%; }
         }
-        
-        .faq-item.open .faq-icon {
-            transform: rotate(180deg);
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f0f13;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2a2a33;
-            border-radius: 6px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3a3a45;
-        }
-        
-        /* Copy toast */
-        .copy-toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e1e26;
-            color: #d1d5db;
-            padding: 0.75rem 1.5rem;
-            border-radius: 999px;
-            font-size: 0.875rem;
-            border: 1px solid #33333d;
-            box-shadow: 0 10px 25px -5px black;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-            white-space: nowrap;
+        @media (min-width:769px) {
+            .copy-btn .btn-text { display:inline; }
+            .howtoplay-grid { grid-template-columns:repeat(2,1fr); }
+            .worlds-grid { grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); }
         }
     </style>
 </head>
-<body class="text-gray-200">
-
-    <!-- Copy toast notification -->
-    <div id="copyToast" class="copy-toast">📋 Copied to clipboard</div>
-
-    <!-- Navbar -->
-    <nav class="glass-card fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-6xl z-50 px-4 py-3">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 md:gap-3">
-                <span class="text-2xl md:text-3xl font-black text-gray-200">🌐</span>
-                <span class="font-bold text-lg md:text-xl tracking-tight">GTPLAY</span>
-                <span class="text-[10px] md:text-xs bg-[#1f1f27] px-2 py-1 rounded-full border border-[#33333d] hidden sm:inline">v2.0</span>
-            </div>
-            <div class="flex items-center gap-1 md:gap-2">
-                <a href="#" class="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm text-gray-300 hover:text-white hover:bg-[#1f1f27] rounded-lg transition">Dashboard</a>
-                <a href="#" class="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm text-gray-300 hover:text-white hover:bg-[#1f1f27] rounded-lg transition">Hosts</a>
-                <a href="#" class="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm text-gray-300 hover:text-white hover:bg-[#1f1f27] rounded-lg transition">Guide</a>
+<body oncontextmenu="return false">
+<div class="noise"></div>
+<div id="app">
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo" id="logoHomeBtn">
+                <!-- Logo GTPLAY -->
+                <img src="GTPLAY.jpeg" alt="GTPLAY" onerror="this.style.display='none'; document.getElementById('logoTextFallback').style.display='block';">
+                <span class="topbar-logo-text" id="logoTextFallback" style="display:none;">GTPLAY</span>
             </div>
         </div>
-    </nav>
-
-    <!-- Main container -->
-    <div class="max-w-7xl mx-auto px-4 pt-28 pb-12">
-
-        <!-- Header with status -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-1">Server <span class="text-gray-300">GTPLAY</span></h1>
-                <div class="flex items-center gap-3 text-sm">
-                    <span id="statusBadge" class="inline-flex items-center gap-1.5 badge-online px-3 py-1 rounded-full">
-                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                        <span>Online</span>
-                    </span>
-                    <span class="text-gray-500">91.134.85.13:6986</span>
-                </div>
+        <div class="topbar-right">
+            <div class="burger-btn" id="burgerBtn" onclick="toggleBurger()">
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
             </div>
-            <div class="flex gap-2">
-                <div class="glass-card px-4 py-2 text-center min-w-[70px]">
-                    <p class="text-[10px] text-gray-500">ONLINE</p>
-                    <p class="text-xl font-bold text-green-400 value-update" id="onlinePlayers">7</p>
-                </div>
-                <div class="glass-card px-4 py-2 text-center min-w-[70px]">
-                    <p class="text-[10px] text-gray-500">WORLDS</p>
-                    <p class="text-xl font-bold text-blue-400" id="totalWorlds">84</p>
-                </div>
-                <div class="glass-card px-4 py-2 text-center min-w-[70px]">
-                    <p class="text-[10px] text-gray-500">CPU</p>
-                    <p class="text-xl font-bold text-yellow-400 value-update" id="cpuUsage">4.3%</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats row -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div class="glass-card p-3 flex items-center gap-3">
-                <i class="fas fa-microchip text-gray-400 text-xl"></i>
-                <div>
-                    <p class="text-[10px] text-gray-500">Memory</p>
-                    <p class="font-semibold text-sm value-update" id="memoryUsage">1189 MB</p>
-                </div>
-            </div>
-            <div class="glass-card p-3 flex items-center gap-3">
-                <i class="fas fa-database text-gray-400 text-xl"></i>
-                <div>
-                    <p class="text-[10px] text-gray-500">Storage</p>
-                    <p class="font-semibold text-sm value-update" id="storageUsage">345 MB</p>
-                </div>
-            </div>
-            <div class="glass-card p-3 flex items-center gap-3">
-                <i class="fas fa-users text-gray-400 text-xl"></i>
-                <div>
-                    <p class="text-[10px] text-gray-500">Max Players</p>
-                    <p class="font-semibold text-sm" id="maxPlayers">4000</p>
-                </div>
-            </div>
-            <div class="glass-card p-3 flex items-center gap-3">
-                <i class="fas fa-clock text-gray-400 text-xl"></i>
-                <div>
-                    <p class="text-[10px] text-gray-500">Uptime</p>
-                    <p class="font-semibold text-sm" id="uptime">-</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Player Activity Chart -->
-        <div class="glass-card p-5 mb-6">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i class="fas fa-chart-line text-green-400"></i>
-                24h Player Activity
-            </h2>
-            <div class="chart-container">
-                <canvas id="playerChart"></canvas>
-            </div>
-            <div class="flex justify-between text-xs text-gray-500 mt-2">
-                <span>24h ago</span>
-                <span>12h ago</span>
-                <span>Now</span>
-            </div>
-        </div>
-
-        <!-- Server Health & Records -->
-        <div class="grid md:grid-cols-2 gap-6 mb-6">
-            <!-- Server Health -->
-            <div class="glass-card p-5">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-heart-pulse text-red-400"></i>
-                    Server Health
-                </h2>
-                <div class="space-y-4">
-                    <!-- CPU Bar -->
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-400">CPU Usage</span>
-                            <span class="text-yellow-400" id="cpuPercent">4.3%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="cpuBar" class="progress-fill bg-yellow-400" style="width: 4.3%"></div>
-                        </div>
-                    </div>
-                    <!-- Memory Bar (asumsi total 4GB) -->
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-400">Memory Usage</span>
-                            <span class="text-blue-400" id="memPercent">29%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="memBar" class="progress-fill bg-blue-400" style="width: 29%"></div>
-                        </div>
-                    </div>
-                    <!-- Storage Bar (asumsi total 2GB) -->
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-400">Storage Usage</span>
-                            <span class="text-green-400" id="storagePercent">17%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="storageBar" class="progress-fill bg-green-400" style="width: 17%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Server Records -->
-            <div class="glass-card p-5">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-trophy text-purple-400"></i>
-                    Server Records
-                </h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-[#1a1a20] p-4 rounded-lg text-center">
-                        <p class="text-xs text-gray-500 mb-1">Record Online</p>
-                        <p class="text-3xl font-bold text-yellow-400" id="recordPlayers">37</p>
-                        <p class="text-xs text-gray-600 mt-1">players</p>
-                    </div>
-                    <div class="bg-[#1a1a20] p-4 rounded-lg text-center">
-                        <p class="text-xs text-gray-500 mb-1">Max Players</p>
-                        <p class="text-3xl font-bold text-blue-400" id="maxPlayersRecord">2000</p>
-                        <p class="text-xs text-gray-600 mt-1">capacity</p>
-                    </div>
-                </div>
-                <div class="mt-4 p-3 bg-[#0f0f13] rounded-lg">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-400">Current Load</span>
-                        <span class="text-green-400" id="loadText">0.4%</span>
-                    </div>
-                    <div class="progress-bar mt-2">
-                        <div id="loadBar" class="progress-fill bg-green-400" style="width: 0.4%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hosts Section + Community -->
-        <div class="grid lg:grid-cols-3 gap-6 mb-6">
-            
-            <!-- Left: Hosts list (2/3 on desktop) -->
-            <div class="lg:col-span-2">
-                <div class="glass-card p-5">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <i class="fas fa-plug text-gray-400"></i>
-                        Connection Hosts
-                    </h2>
-                    
-                    <div class="space-y-3">
-                        <!-- PowerTunnel -->
-                        <div class="host-item">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-bolt text-gray-400 w-5"></i>
-                                <div>
-                                    <p class="font-medium">PowerTunnel</p>
-                                    <p class="text-xs text-gray-500">Android</p>
-                                </div>
-                            </div>
-                            <button onclick="copyHost('ptunel')" class="copy-btn">
-                                <i class="far fa-copy"></i>
-                                <span class="hidden sm:inline">Copy</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Surge 5 -->
-                        <div class="host-item">
-                            <div class="flex items-center gap-3">
-                                <i class="fab fa-apple text-gray-400 w-5 text-lg"></i>
-                                <div>
-                                    <p class="font-medium">Surge 5</p>
-                                    <p class="text-xs text-gray-500">iOS</p>
-                                </div>
-                            </div>
-                            <button onclick="copyHost('surge')" class="copy-btn">
-                                <i class="far fa-copy"></i>
-                                <span class="hidden sm:inline">Copy</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Virtual Host -->
-                        <div class="host-item">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-network-wired text-gray-400 w-5"></i>
-                                <div>
-                                    <p class="font-medium">Virtual Host</p>
-                                    <p class="text-xs text-gray-500">Android/PC</p>
-                                </div>
-                            </div>
-                            <button onclick="copyHost('vhost')" class="copy-btn">
-                                <i class="far fa-copy"></i>
-                                <span class="hidden sm:inline">Copy</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Windows Hosts -->
-                        <div class="host-item">
-                            <div class="flex items-center gap-3">
-                                <i class="fab fa-windows text-gray-400 w-5"></i>
-                                <div>
-                                    <p class="font-medium">Windows Hosts</p>
-                                    <p class="text-xs text-gray-500">PC</p>
-                                </div>
-                            </div>
-                            <button onclick="copyHost('windows')" class="copy-btn">
-                                <i class="far fa-copy"></i>
-                                <span class="hidden sm:inline">Copy</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Custom APK GTPLAY -->
-                        <div class="host-item">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-android text-gray-400 w-5"></i>
-                                <div>
-                                    <p class="font-medium">GTPLAY Custom APK</p>
-                                    <p class="text-xs text-gray-500">Android · Direct download</p>
-                                </div>
-                            </div>
-                            <a href="https://www.mediafire.com/file/nkhgi4w6b3uc8bg/MEATPS.apk/file" target="_blank" class="download-btn">
-                                <i class="fas fa-download"></i>
-                                <span class="hidden sm:inline">Download</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right: Community Cards -->
-            <div class="lg:col-span-1">
-                <div class="glass-card p-5 h-full flex flex-col gap-4">
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <i class="fas fa-users text-gray-400"></i>
-                        Community
-                    </h2>
-                    
-                    <!-- WhatsApp -->
-                    <a id="whatsappLink" href="#" target="_blank" 
-                       class="block bg-[#1a1a20] hover:bg-[#22222a] border border-[#2a2a33] rounded-xl p-4 transition">
-                        <div class="flex items-center gap-3">
-                            <i class="fab fa-whatsapp text-2xl text-[#25D366]"></i>
-                            <div class="flex-1">
-                                <p class="font-medium">WhatsApp Group</p>
-                                <p class="text-xs text-gray-500">PUBLIC CHAT || GTPLAY</p>
-                            </div>
-                            <i class="fas fa-arrow-right text-gray-500 text-sm"></i>
-                        </div>
-                    </a>
-                    
-                    <!-- Discord -->
-                    <a href="https://discord.gg/BEDfw6JBZ" target="_blank" 
-                       class="block bg-[#1a1a20] hover:bg-[#22222a] border border-[#2a2a33] rounded-xl p-4 transition">
-                        <div class="flex items-center gap-3">
-                            <i class="fab fa-discord text-2xl text-[#5865F2]"></i>
-                            <div class="flex-1">
-                                <p class="font-medium">Discord Server</p>
-                                <p class="text-xs text-gray-500">Join discord.gg/BEDfw6JBZ</p>
-                            </div>
-                            <i class="fas fa-arrow-right text-gray-500 text-sm"></i>
-                        </div>
-                    </a>
-                    
-                    <!-- Quick guide preview -->
-                    <div class="mt-2 p-3 bg-[#0f0f13] rounded-xl border border-[#22222a]">
-                        <p class="text-xs font-medium mb-2">📖 Quick Guide</p>
-                        <p class="text-xs text-gray-500 mb-1">• Android: PowerTunnel / Custom APK</p>
-                        <p class="text-xs text-gray-500 mb-1">• iOS: Surge 5</p>
-                        <p class="text-xs text-gray-500">• PC: Virtual Host / Hosts file</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- World Categories (STARTS, BFG, SHOP) -->
-        <div class="grid md:grid-cols-3 gap-6 mb-6">
-            <!-- World Categories -->
-            <div class="glass-card p-5">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-layer-group text-green-400"></i>
-                    World Categories
-                </h2>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-[#1a1a20] p-3 rounded-lg">
-                        <span class="text-xs text-gray-400">STARTS</span>
-                        <p class="text-xl font-bold text-green-400" id="startsWorlds">0</p>
-                    </div>
-                    <div class="bg-[#1a1a20] p-3 rounded-lg">
-                        <span class="text-xs text-gray-400">BFG</span>
-                        <p class="text-xl font-bold text-purple-400" id="bfgWorlds">0</p>
-                    </div>
-                    <div class="bg-[#1a1a20] p-3 rounded-lg">
-                        <span class="text-xs text-gray-400">SHOP</span>
-                        <p class="text-xl font-bold text-yellow-400" id="shopWorlds">0</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Active vs Empty Worlds -->
-            <div class="glass-card p-5">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-purple-400"></i>
-                    World Status
-                </h2>
-                <div class="space-y-3">
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-400">Active Worlds</span>
-                            <span class="text-green-400" id="activeWorldsCount">6</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="activeWorldsBar" class="progress-fill bg-green-400" style="width: 7%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-400">Empty Worlds</span>
-                            <span class="text-gray-400" id="emptyWorldsCount">78</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="emptyWorldsBar" class="progress-fill bg-gray-500" style="width: 93%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top Worlds Preview -->
-            <div class="glass-card p-5">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-crown text-yellow-500"></i>
-                    Top Worlds
-                </h2>
-                <div id="topWorldsList" class="space-y-2">
-                    <div class="text-center text-gray-500 text-sm">Loading...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tutorial Section -->
-        <div class="glass-card p-5 mb-6">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i class="fas fa-book-open text-gray-400"></i>
-                Setup Guides
-            </h2>
-            
-            <div class="grid md:grid-cols-2 gap-4">
-                <!-- Android -->
-                <div class="border-l-2 border-gray-700 pl-4">
-                    <p class="font-medium mb-2 flex items-center gap-2"><i class="fab fa-android"></i> Android</p>
-                    <ol class="text-xs text-gray-400 list-decimal ml-4 space-y-1">
-                        <li>Use <span class="text-gray-300">PowerTunnel</span> or download <span class="text-gray-300">Custom APK</span></li>
-                        <li>Click copy on PowerTunnel → paste in app</li>
-                        <li>For Virtual Host: copy hosts entries</li>
-                        <li>Login to Growtopia!</li>
-                    </ol>
-                </div>
-                
-                <!-- iOS -->
-                <div class="border-l-2 border-gray-700 pl-4">
-                    <p class="font-medium mb-2 flex items-center gap-2"><i class="fab fa-apple"></i> iOS</p>
-                    <ol class="text-xs text-gray-400 list-decimal ml-4 space-y-1">
-                        <li>Install <span class="text-gray-300">Surge 5</span> from App Store</li>
-                        <li>Copy Surge host → Import Profile from URL</li>
-                        <li>Setup VPN → Allow configuration</li>
-                        <li>Done, open Growtopia</li>
-                    </ol>
-                </div>
-                
-                <!-- Windows -->
-                <div class="border-l-2 border-gray-700 pl-4">
-                    <p class="font-medium mb-2 flex items-center gap-2"><i class="fab fa-windows"></i> Windows</p>
-                    <ol class="text-xs text-gray-400 list-decimal ml-4 space-y-1">
-                        <li>Press <span class="text-gray-300">Win + R</span>, type: <code class="bg-black/30 px-1">C:\Windows\System32\drivers\etc</code></li>
-                        <li>Edit <span class="text-gray-300">hosts</span> file with Notepad</li>
-                        <li>Copy Windows hosts entries → paste at bottom</li>
-                        <li>Save and login</li>
-                    </ol>
-                </div>
-                
-                <!-- Virtual Host -->
-                <div class="border-l-2 border-gray-700 pl-4">
-                    <p class="font-medium mb-2 flex items-center gap-2"><i class="fas fa-network-wired"></i> Virtual Host</p>
-                    <ol class="text-xs text-gray-400 list-decimal ml-4 space-y-1">
-                        <li>Copy Virtual Host entries</li>
-                        <li>Open Virtual Host app on Android/PC</li>
-                        <li>Paste and apply</li>
-                        <li>Connect to server</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-
-        <!-- Active Worlds -->
-        <div class="glass-card p-5 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold flex items-center gap-2">
-                    <i class="fas fa-globe text-gray-400"></i>
-                    Active Worlds
-                </h2>
-                <span class="text-xs bg-[#1f1f27] px-3 py-1 rounded-full border border-[#33333d]" id="worldsCount">6 worlds</span>
-            </div>
-            
-            <div id="worldsContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                <!-- JS akan inject -->
-                <div class="world-card animate-pulse">
-                    <div class="h-4 bg-[#25252d] rounded w-3/4 mx-auto mb-2"></div>
-                    <div class="h-3 bg-[#1f1f27] rounded w-1/2 mx-auto"></div>
-                </div>
-                <div class="world-card animate-pulse">
-                    <div class="h-4 bg-[#25252d] rounded w-3/4 mx-auto mb-2"></div>
-                    <div class="h-3 bg-[#1f1f27] rounded w-1/2 mx-auto"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Owner & Co-Owner Section -->
-        <div class="glass-card p-5 mb-6">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i class="fas fa-crown text-yellow-500"></i>
-                Server Team
-            </h2>
-            
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Owners -->
-                <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <i class="fas fa-crown text-yellow-500 text-sm"></i>
-                        <h3 class="font-medium text-gray-300">Owners</h3>
-                    </div>
-                    <div class="space-y-2">
-                        <!-- Owner 1: frost -->
-                        <div class="owner-card">
-                            <div class="owner-avatar">F</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-medium">frost</p>
-                                    <span class="owner-badge">Owner</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Owner #1</p>
-                            </div>
-                            <i class="fas fa-shield-alt text-yellow-500/50"></i>
-                        </div>
-                        
-                        <!-- Owner 2: gece -->
-                        <div class="owner-card">
-                            <div class="owner-avatar">G</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-medium">gece</p>
-                                    <span class="owner-badge">Owner</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Owner #2</p>
-                            </div>
-                            <i class="fas fa-shield-alt text-yellow-500/50"></i>
-                        </div>
-                        
-                        <!-- Owner 3: naxy -->
-                        <div class="owner-card">
-                            <div class="owner-avatar">N</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-medium">naxy</p>
-                                    <span class="owner-badge">Owner</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Owner #3</p>
-                            </div>
-                            <i class="fas fa-shield-alt text-yellow-500/50"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Co-Owners -->
-                <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <i class="fas fa-star text-blue-400 text-sm"></i>
-                        <h3 class="font-medium text-gray-300">Co-Owners</h3>
-                    </div>
-                    <div class="space-y-2">
-                        <!-- Co-Owner 1: lang -->
-                        <div class="owner-card">
-                            <div class="co-owner-avatar">L</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-medium">lang</p>
-                                    <span class="co-owner-badge">Co-Owner</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Co-Owner #1</p>
-                            </div>
-                            <i class="fas fa-shield-alt text-blue-400/50"></i>
-                        </div>
-                        
-                        <!-- Co-Owner 2: speed -->
-                        <div class="owner-card">
-                            <div class="co-owner-avatar">S</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-medium">speed</p>
-                                    <span class="co-owner-badge">Co-Owner</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Co-Owner #2</p>
-                            </div>
-                            <i class="fas fa-shield-alt text-blue-400/50"></i>
-                        </div>
-                        
-                        <!-- Co-Owner 3: edush -->
-                        <div class="owner-card">
-                            <div class="co-owner-avatar">E</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-medium">edush</p>
-                                    <span class="co-owner-badge">Co-Owner</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Co-Owner #3</p>
-                            </div>
-                            <i class="fas fa-shield-alt text-blue-400/50"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- FAQ Section (NEW) -->
-        <div class="glass-card p-5 mb-6">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i class="fas fa-question-circle text-blue-400"></i>
-                Frequently Asked Questions
-            </h2>
-            
-            <div class="space-y-2" id="faqContainer">
-                <!-- FAQ 1 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>❓ Apa itu GTPLAY?</span>
-                        <i class="fas fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer hidden">
-                        GTPLAY adalah private server Growtopia yang menyediakan pengalaman bermain berbeda dengan fitur-fitur eksklusif. GTPLAY merupakan singkatan dari "Meat Private Server" yang dikembangkan oleh tim yang berdedikasi untuk memberikan pengalaman terbaik bagi para pemain Growtopia.
-                    </div>
-                </div>
-                
-                <!-- FAQ 2 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>❓ Apa itu Growsoft?</span>
-                        <i class="fas fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer hidden">
-                        Growsoft adalah platform atau launcher yang digunakan untuk memudahkan akses ke private server Growtopia seperti GTPLAY. Dengan Growsoft, pemain tidak perlu repot mengatur hosts file secara manual karena sudah otomatis terkonfigurasi. Growsoft tersedia untuk Windows dan Android.
-                    </div>
-                </div>
-                
-                <!-- FAQ 3 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>❓ Gimana cara join server GTPLAY</span>
-                        <i class="fas fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer hidden">
-                        Ada beberapa cara:<br>
-                        • <span class="text-gray-300">Android:</span> Gunakan PowerTunnel atau download Custom APK GTPLAY<br>
-                        • <span class="text-gray-300">iOS:</span> Gunakan Surge 5 dengan mengcopy profile host<br>
-                        • <span class="text-gray-300">PC:</span> Edit hosts file atau gunakan Virtual Host<br>
-                        • <span class="text-gray-300">Semua platform:</span> Gunakan Growsoft untuk kemudahan akses<br><br>
-                        Semua panduan lengkap ada di bagian Setup Guides di atas.
-                    </div>
-                </div>
-                
-                <!-- FAQ 4 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>❓ Fitur apa aja yang ada di server GTPLAY</span>
-                        <i class="fas fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer hidden">
-                        Server GTPLAY memiliki berbagai fitur unggulan:<br>
-                        • ✅ Level dan world unlimited<br>
-                        • ✅ Drop rate yang lebih tinggi<br>
-                        • ✅ Event rutin setiap minggu<br>
-                        • ✅ Admin aktif 24/7<br>
-                        • ✅ World khusus STARTS untuk pemula<br>
-                        • ✅ BFG world untuk farming cepat<br>
-                        • ✅ SHOP world dengan harga terjangkau<br>
-                        • ✅ Support 2000+ players online
-                    </div>
-                </div>
-                
-                <!-- FAQ 5 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>❓ Server GTPLAY aman gak?</span>
-                        <i class="fas fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer hidden">
-                        Sangat aman! GTPLAY sudah berjalan selama 2+ tahun dengan ribuan member. Tim admin selalu memantau server 24/7 dan melakukan backup data secara rutin. Tidak ada kasus data breach atau hack selama server beroperasi. Kami juga menggunakan sistem keamanan berlapis untuk melindungi data pemain.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="mt-6 text-center text-xs text-gray-600">
-            GTPLAY Dashboard · Real-time data · Last update <span id="lastUpdate">-</span>
         </div>
     </div>
+    <div class="burger-overlay" id="burgerOverlay" onclick="closeBurger()"></div>
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-menu-header">
+            <div class="burger-menu-user">GTPLAY</div>
+            <div class="burger-menu-sub">Private Server · Official</div>
+        </div>
+        <div class="burger-nav">
+            <div class="burger-nav-item active" id="nav-home" onclick="navTo('home')"><span class="nav-icon"><i class="fas fa-home"></i></span><span>Home</span></div>
+            <div class="burger-nav-item" id="nav-info" onclick="navTo('info')"><span class="nav-icon"><i class="fas fa-info-circle"></i></span><span>Info</span></div>
+            <div class="burger-nav-item" id="nav-host" onclick="navTo('host')"><span class="nav-icon"><i class="fas fa-plug"></i></span><span>Host</span></div>
+            <div class="burger-nav-item" id="nav-howtoplay" onclick="navTo('howtoplay')"><span class="nav-icon"><i class="fas fa-gamepad"></i></span><span>How to Play</span></div>
+            <div class="burger-nav-item" id="nav-search" onclick="navTo('search')"><span class="nav-icon"><i class="fas fa-search"></i></span><span>Search Item</span></div>
+            <div class="burger-nav-item" id="nav-event" onclick="navTo('event')"><span class="nav-icon"><i class="fas fa-calendar-alt"></i></span><span>Event</span></div>
+            <div class="burger-nav-item" id="nav-community" onclick="navTo('community')"><span class="nav-icon"><i class="fas fa-users"></i></span><span>Community</span></div>
+        </div>
+    </div>
+    <div class="page-container">
+        <!-- HOME PAGE -->
+        <div class="page active" id="page-home">
+            <div class="dash-card" id="dashHeaderCard">
+                <div class="dash-header">
+                    <div class="dash-header-left">
+                        <i class="fas fa-server"></i>
+                        <div class="dash-header-info">
+                            <h1 id="serverName">GTPLAY</h1>
+                            <div class="dash-header-meta">
+                                <span class="badge-id" id="serverIdBadge">ID: 6986</span>
+                                <span class="badge-ip" id="serverIP">91.134.85.13:6986</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-badge status-online" id="statusContainer">
+                        <span class="pulse-dot"></span>
+                        <span id="statusText">ONLINE</span>
+                        <span id="playerCount" style="font-weight:400;opacity:0.8;"></span>
+                    </div>
+                </div>
+                <div class="dash-header-footer">
+                    <span><i class="far fa-clock"></i> Last update: <span id="lastUpdate">-</span></span>
+                    <span><i class="fas fa-chart-line"></i> Real-time data</span>
+                </div>
+            </div>
+            <div class="metric-row">
+                <div class="metric-box"><i class="fas fa-microchip metric-cpu"></i><div class="metric-label">CPU</div><div class="metric-value metric-cpu" id="cpuUsage">0%</div></div>
+                <div class="metric-box"><i class="fas fa-memory metric-ram"></i><div class="metric-label">RAM</div><div class="metric-value metric-ram" id="memoryUsage">0 MB</div></div>
+                <div class="metric-box"><i class="fas fa-database metric-storage"></i><div class="metric-label">STORAGE</div><div class="metric-value metric-storage" id="storageUsage">0 MB</div></div>
+            </div>
+            <div class="dash-card">
+                <h2><i class="fas fa-heartbeat" style="color:#f87171;"></i> Server Health</h2>
+                <div class="progress-group"><div class="progress-label-row"><span>CPU Usage</span><span class="progress-val metric-cpu" id="cpuPercent">0%</span></div><div class="progress-bar"><div class="progress-fill cpu" id="cpuBar" style="width:0%"></div></div></div>
+                <div class="progress-group"><div class="progress-label-row"><span>Memory Usage</span><span class="progress-val metric-ram" id="memPercent">0%</span></div><div class="progress-bar"><div class="progress-fill ram" id="memBar" style="width:0%"></div></div></div>
+                <div class="progress-group"><div class="progress-label-row"><span>Storage Usage</span><span class="progress-val metric-storage" id="storagePercent">0%</span></div><div class="progress-bar"><div class="progress-fill storage" id="storageBar" style="width:0%"></div></div></div>
+            </div>
+            <div class="dash-grid-2">
+                <div class="dash-card">
+                    <h2><i class="fas fa-tags" style="color:#c084fc;"></i> World Categories</h2>
+                    <div class="cat-grid">
+                        <div class="cat-box"><span class="cat-tag tag-starts">STARTS</span><div class="cat-count green" id="startsWorlds">0</div></div>
+                        <div class="cat-box"><span class="cat-tag tag-bfg">BFG</span><div class="cat-count purple" id="bfgWorlds">0</div></div>
+                        <div class="cat-box"><span class="cat-tag tag-shop">SHOP</span><div class="cat-count yellow" id="shopWorlds">0</div></div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <h2><i class="fas fa-chart-line" style="color:#4ade80;"></i> 24 Hour Activity</h2>
+                    <div class="chart-wrap"><canvas id="worldChart"></canvas></div>
+                    <div class="chart-legend"><span>24h ago</span><span>12h ago</span><span>Now</span></div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <h2><i class="fas fa-globe" style="color:#60a5fa;"></i> Worlds Online</h2>
+                <div class="world-stats-row">
+                    <div class="world-stat-pill">Active: <span id="activeWorldsCount">0</span></div>
+                    <div class="world-stat-pill">Empty: <span id="emptyWorldsCount">0</span></div>
+                    <div class="world-stat-pill">Total: <span id="totalWorldsCount">0</span></div>
+                </div>
+                <div class="worlds-grid" id="worldsContainer">
+                    <div class="world-skeleton"><div class="skel-line"></div><div class="skel-line"></div></div>
+                </div>
+            </div>
+        </div>
 
-    <script>
-        // ==================== CONFIG ====================
-        const API_MAIN = 'https://api.gtps.cloud/api/server/public/6986';
-        const API_STATUS = 'https://api.gtps.cloud/g-api/20367/status';
-        const API_WORLDS = 'https://api.gtps.cloud/g-api/20367/worlds';
-        const WA_LINK = 'https://chat.whatsapp.com/HuWiXSaje59Jdvbq2QW7UC?mode=gi_t';
-        
-        // Host data
-        const HOSTS = {
-            ptunel: 'https://dash.gtps.cloud/android/6986',
-            surge: 'https://dash.gtps.cloud/ios/6986',
-            vhost: '91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com',
-            windows: '91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com'
-        };
+        <!-- INFO PAGE -->
+        <div class="page" id="page-info">
+            <div class="info-card">
+                <h2>INFO SERVER GTPLAY</h2>
+                <p>Ini adalah <strong style="color:var(--text);">server privat Growtopia</strong> (GTPS) bernama <strong style="color:#fbbf24;">GTPLAY</strong>, bukan server resmi. Di sini kamu <strong style="color:var(--success);">bebas ngapain aja</strong> tanpa batasan.</p>
+                <div class="info-highlight">⚡ Unlimited Gems · Free Items · Custom Worlds · No Ban · No Rules (tapi tetap santuy)</div>
+                <div class="placeholder-list">
+                    <div class="placeholder-item">🪙 Unlimited Diamond Lock & World Lock gratis</div>
+                    <div class="placeholder-item">🎁 Semua item bisa di-spawn, termasuk item langka</div>
+                    <div class="placeholder-item">🌍 Buat world sesukamu tanpa takut dihapus</div>
+                    <div class="placeholder-item">🎮 Mode permainan khusus: BFG, Start, Casino, Parkour</div>
+                    <div class="placeholder-item">🤝 Komunitas santai, bebas sharing script & mod</div>
+                    <div class="placeholder-item">🔄 Update rutin dengan fitur eksklusif</div>
+                </div>
+            </div>
+        </div>
 
-        // Store previous values for animation
-        let prevValues = {};
-        
-        // Chart instance
-        let playerChart = null;
+        <!-- HOST PAGE -->
+        <div class="page" id="page-host">
+            <div class="host-section">
+                <div class="host-header"><i class="fas fa-plug"></i><h2>Host Connection Methods</h2></div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div class="host-item"><div class="host-info"><i class="fas fa-bolt"></i><span class="host-name">PowerTunnel</span><span class="host-platform">Android</span></div><div class="host-actions"><button class="copy-btn" data-copy-text="https://dash.gtps.cloud/android/6986" data-host-name="PowerTunnel"><i class="far fa-copy"></i><span class="btn-text">Copy URL</span></button></div></div>
+                    <div class="host-item"><div class="host-info"><i class="fab fa-apple"></i><span class="host-name">Surge 5</span><span class="host-platform">iOS</span></div><div class="host-actions"><button class="copy-btn" data-copy-text="https://dash.gtps.cloud/ios/6986" data-host-name="Surge 5"><i class="far fa-copy"></i><span class="btn-text">Copy URL</span></button></div></div>
+                    <div class="host-item"><div class="host-info"><i class="fas fa-network-wired"></i><span class="host-name">Virtual Host</span><span class="host-platform">Android/PC</span></div><div class="host-actions"><button class="copy-btn" data-copy-text="91.134.85.13 growtopia1.com&#10;91.134.85.13 growtopia2.com&#10;91.134.85.13 www.growtopia1.com&#10;91.134.85.13 www.growtopia2.com" data-host-name="Virtual Host"><i class="far fa-copy"></i><span class="btn-text">Copy entries</span></button></div></div>
+                    <div class="host-item"><div class="host-info"><i class="fab fa-windows"></i><span class="host-name">Windows Hosts</span><span class="host-platform">PC</span></div><div class="host-actions"><button class="copy-btn" data-copy-text="91.134.85.13 growtopia1.com&#10;91.134.85.13 growtopia2.com&#10;91.134.85.13 www.growtopia1.com&#10;91.134.85.13 www.growtopia2.com" data-host-name="Windows Hosts"><i class="far fa-copy"></i><span class="btn-text">Copy entries</span></button></div></div>
+                    <div class="host-item"><div class="host-info"><div class="custom-icon"><i class="fas fa-download"></i></div><span class="host-name">GTPLAY Custom APK</span><span class="host-platform">Android</span></div><div class="host-actions"><a href="https://www.mediafire.com/file/jtawd7smd92nnsx/GTPLAY.apk/file" target="_blank" class="download-btn"><i class="fas fa-download"></i></a></div></div>
+                </div>
+                <div class="helper-note">Alternatif termudah: Gunakan Growsoft (Windows dan Android) yang otomatis mengatur hosts.</div>
+            </div>
+        </div>
 
-        // ==================== TOGGLE FAQ ====================
-        function toggleFaq(element) {
-            const faqItem = element.closest('.faq-item');
-            const answer = faqItem.querySelector('.faq-answer');
-            const icon = element.querySelector('.faq-icon');
-            
-            // Toggle answer
-            answer.classList.toggle('hidden');
-            
-            // Toggle icon rotation
-            faqItem.classList.toggle('open');
-            
-            // Close other FAQs
-            const allItems = document.querySelectorAll('.faq-item');
-            allItems.forEach(item => {
-                if (item !== faqItem && item.classList.contains('open')) {
-                    item.querySelector('.faq-answer').classList.add('hidden');
-                    item.classList.remove('open');
-                }
-            });
+        <!-- HOW TO PLAY PAGE -->
+        <div class="page" id="page-howtoplay">
+            <div class="info-card">
+                <h2>HOW TO PLAY - GTPLAY</h2>
+                <p>Panduan lengkap untuk semua platform.</p>
+                <div class="howtoplay-grid">
+                    <div class="how-card"><h3><i class="fab fa-android" style="color:#4ade80;"></i> Android</h3><ul class="step-list"><li>Gunakan PowerTunnel atau Custom APK</li><li>Copy URL: <span class="inline-copy" onclick="copyText('https://dash.gtps.cloud/android/6986')"><i class="far fa-copy"></i> Copy</span></li><li>Buka PowerTunnel → Tempel → Aktifkan</li><li>Buka Growtopia</li></ul></div>
+                    <div class="how-card"><h3><i class="fab fa-apple" style="color:#9ca3af;"></i> iOS</h3><ul class="step-list"><li>Install Surge 5</li><li>Copy URL: <span class="inline-copy" onclick="copyText('https://dash.gtps.cloud/ios/6986')"><i class="far fa-copy"></i> Copy</span></li><li>Surge → Import Profile from URL</li><li>Aktifkan VPN → Buka Growtopia</li></ul></div>
+                    <div class="how-card"><h3><i class="fab fa-windows" style="color:#60a5fa;"></i> Windows</h3><ul class="step-list"><li>Buka Notepad sebagai Admin</li><li>Buka hosts file</li><li>Copy: <span class="inline-copy" onclick="copyText('91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com')"><i class="far fa-copy"></i> Copy</span></li><li>Tempel & simpan</li></ul></div>
+                    <div class="how-card"><h3><i class="fas fa-network-wired" style="color:#c084fc;"></i> Virtual Host</h3><ul class="step-list"><li>Install Virtual Host</li><li>Copy: <span class="inline-copy" onclick="copyText('91.134.85.13 growtopia1.com\n91.134.85.13 growtopia2.com\n91.134.85.13 www.growtopia1.com\n91.134.85.13 www.growtopia2.com')"><i class="far fa-copy"></i> Copy</span></li><li>Tempel & aktifkan</li></ul></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH ITEM PAGE -->
+        <div class="page" id="page-search">
+            <div class="info-card">
+                <h2>SEARCH ITEM</h2>
+                <p>Cari gambar item berdasarkan ID. Server ID: 6986</p>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="itemIdInput" placeholder="Masukkan Item ID (contoh: 2, 18, 242)">
+                    <button class="search-btn" id="searchItemBtn"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <div class="item-result" id="itemResult">
+                    <div class="item-img-container">
+                        <div class="anti-leak-overlay"></div>
+                        <img id="itemImage" src="" alt="Item Texture" style="display:none;">
+                    </div>
+                    <button class="download-item-btn" id="downloadItemBtn" style="display:none;"><i class="fas fa-download"></i> Download Gambar</button>
+                    <p id="itemError" style="color:#f87171; margin-top:12px; display:none;"></p>
+                </div>
+                <p class="info-highlight" style="margin-top:20px;"><i class="fas fa-shield-alt"></i> Gambar tidak bisa di-download langsung. Gunakan tombol download resmi.</p>
+            </div>
+        </div>
+
+        <!-- EVENT PAGE -->
+        <div class="page" id="page-event">
+            <div class="info-card">
+                <h2>🔥 EVENT SERVER GTPLAY</h2>
+                <p>Event eksklusif yang sedang dan akan berlangsung di server privat kami.</p>
+                <div class="event-grid">
+                    <div class="event-card"><h4>🏆 Tournament BFG</h4><p>Turnamen mingguan dengan hadiah Diamond Lock hingga 500DL.</p><span class="event-tag">MINGGU INI</span></div>
+                    <div class="event-card"><h4>🎉 Giveaway Item Langka</h4><p>Event random giveaway item seperti Phoenix Wings, Rainbow Carpet.</p><span class="event-tag">SETIAP HARI</span></div>
+                    <div class="event-card"><h4>🧟 Zombie Survival</h4><p>Mode permainan khusus melawan zombie di world buatan.</p><span class="event-tag">MINGGU DEPAN</span></div>
+                    <div class="event-card"><h4>💎 Casino Night</h4><p>Mainkan berbagai game casino dengan chips gratis.</p><span class="event-tag">JUMAT MALAM</span></div>
+                    <div class="event-card"><h4>🎨 Custom World Contest</h4><p>Lomba mendesain world terkeren. Pemenang dapat hadiah spesial.</p><span class="event-tag">BULAN INI</span></div>
+                    <div class="event-card"><h4>🤝 Community Meetup</h4><p>Ngobrol santai sambil main bareng admin dan mod.</p><span class="event-tag">SABTU</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMUNITY PAGE -->
+        <div class="page" id="page-community">
+            <div class="info-card" style="text-align:center;">
+                <h2>COMMUNITY HUB</h2>
+                <p style="font-size:15px; color:var(--text-dim); max-width:600px; margin:0 auto 8px;">Gabung ke komunitas resmi <strong style="color:#fbbf24;">GTPLAY</strong>. Ngobrol santai, info event, cari teman main, pamer hasil.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-bottom:24px;">
+                    <a href="#" target="_blank" rel="noopener" class="community-btn discord"><i class="fab fa-discord" style="font-size:20px;"></i> JOIN DISCORD COMMUNITY</a>
+                    <a href="#" target="_blank" rel="noopener" class="community-btn whatsapp"><i class="fab fa-whatsapp" style="font-size:20px;"></i> JOIN WA COMMUNITY</a>
+                </div>
+                <div class="info-highlight" style="display:inline-block; text-align:left; max-width:500px;"><i class="fas fa-bullhorn" style="color:var(--accent); margin-right:8px;"></i> Link invite akan diumumkan segera.</div>
+            </div>
+        </div>
+    </div>
+    <div id="toastCopy" class="toast-simple"></div>
+</div>
+
+<script>
+    (function() {
+        const burgerBtn = document.getElementById('burgerBtn'),
+            burgerMenu = document.getElementById('burgerMenu'),
+            burgerOverlay = document.getElementById('burgerOverlay'),
+            logoBtn = document.getElementById('logoHomeBtn'),
+            toastEl = document.getElementById('toastCopy');
+
+        function showToast(msg) {
+            if (!toastEl) return;
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            clearTimeout(toastEl._timer);
+            toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 2000);
         }
 
-        // ==================== COPY TOAST ====================
-        function showToast(msg = '📋 Copied to clipboard') {
-            const toast = document.getElementById('copyToast');
-            toast.style.opacity = '1';
-            toast.textContent = msg;
-            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-        }
-
-        async function copyHost(type) {
-            const text = HOSTS[type];
-            if (!text) return;
-            
+        async function copyToClipboard(text, name) {
             try {
                 await navigator.clipboard.writeText(text);
-                showToast('✅ Host copied!');
+                showToast(name + ' copied');
             } catch {
                 const ta = document.createElement('textarea');
                 ta.value = text;
@@ -995,110 +792,120 @@
                 ta.select();
                 document.execCommand('copy');
                 document.body.removeChild(ta);
-                showToast('✅ Host copied!');
+                showToast(name + ' copied');
             }
         }
 
-        // ==================== FETCH API ====================
+        document.body.addEventListener('click', (e) => {
+            const btn = e.target.closest('.copy-btn');
+            if (btn) {
+                const txt = btn.getAttribute('data-copy-text'),
+                    name = btn.getAttribute('data-host-name') || 'Host';
+                if (txt) copyToClipboard(txt, name);
+            }
+        });
+
+        window.copyText = function(text) { copyToClipboard(text, 'Config'); };
+
+        const allPages = ['home','info','host','howtoplay','search','event','community'];
+        const navMap = {
+            home: 'nav-home',
+            info: 'nav-info',
+            host: 'nav-host',
+            howtoplay: 'nav-howtoplay',
+            search: 'nav-search',
+            event: 'nav-event',
+            community: 'nav-community'
+        };
+
+        window.navTo = function(p) {
+            closeBurger();
+            allPages.forEach(i => document.getElementById('page-' + i)?.classList.remove('active'));
+            document.getElementById('page-' + p)?.classList.add('active');
+            for (const [k, id] of Object.entries(navMap)) {
+                const item = document.getElementById(id);
+                if (item) {
+                    if (k === p) item.classList.add('active');
+                    else item.classList.remove('active');
+                }
+            }
+            if (p === 'home' && window.dashboardChart) {
+                setTimeout(() => { if (window.dashboardChart && window.dashboardChart.canvas) window.dashboardChart.resize(); }, 150);
+            }
+        };
+
+        window.toggleBurger = function() {
+            const o = burgerMenu.classList.toggle('open');
+            burgerBtn.classList.toggle('open', o);
+            burgerOverlay.classList.toggle('open', o);
+        };
+        window.closeBurger = function() {
+            burgerBtn.classList.remove('open');
+            burgerMenu.classList.remove('open');
+            burgerOverlay.classList.remove('open');
+        };
+
+        if (logoBtn) logoBtn.addEventListener('click', (e) => { e.stopPropagation(); navTo('home'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBurger(); });
+        if (burgerMenu) burgerMenu.addEventListener('click', (e) => e.stopPropagation());
+
+        // DASHBOARD API - GTPLAY
+        const SERVER_ID = '6986';
+        const API_MAIN = 'https://api.gtps.cloud/api/server/public/6986';
+        const API_STATUS = 'https://api.gtps.cloud/g-api/58549/status';
+        const API_WORLDS = 'https://api.gtps.cloud/g-api/58549/worlds';
+
         async function fetchJSON(url) {
             try {
                 const res = await fetch(url);
+                if (!res.ok) throw new Error();
                 return await res.json();
-            } catch {
-                return null;
-            }
+            } catch { return null; }
         }
 
-        // ==================== ANIMATE VALUE ====================
-        function animateValue(element, newValue) {
-            if (!element) return;
-            
-            const oldValue = prevValues[element.id];
-            if (oldValue !== undefined && oldValue !== newValue) {
-                element.classList.add('changed');
-                setTimeout(() => {
-                    element.classList.remove('changed');
-                }, 300);
-            }
-            
-            element.textContent = newValue;
-            prevValues[element.id] = newValue;
+        function getCategory(name) {
+            const u = name.toUpperCase();
+            if (u.startsWith('START')) return 'STARTS';
+            if (u.includes('BFG')) return 'BFG';
+            if (u.includes('SHOP')||u.includes('BUY')||u.includes('STORE')) return 'SHOP';
+            return 'OTHER';
+        }
+        function getTagClass(cat) {
+            if (cat==='STARTS') return 'tag-starts';
+            if (cat==='BFG') return 'tag-bfg';
+            if (cat==='SHOP') return 'tag-shop';
+            return 'tag-other';
         }
 
-        // ==================== FORMAT UPTIME ====================
-        function formatUptime(uptimeStr) {
-            if (!uptimeStr) return '-';
-            
-            let totalMinutes = 0;
-            
-            if (uptimeStr.endsWith('m') && !uptimeStr.includes(' ')) {
-                totalMinutes = parseInt(uptimeStr);
-            } else {
-                const parts = uptimeStr.split(' ');
-                parts.forEach(part => {
-                    if (part.endsWith('d')) totalMinutes += parseInt(part) * 1440;
-                    if (part.endsWith('h')) totalMinutes += parseInt(part) * 60;
-                    if (part.endsWith('m')) totalMinutes += parseInt(part);
-                });
-            }
-            
-            if (totalMinutes === 0) return uptimeStr;
-            
-            const days = Math.floor(totalMinutes / 1440);
-            const hours = Math.floor((totalMinutes % 1440) / 60);
-            const minutes = totalMinutes % 60;
-            
-            let result = '';
-            if (days > 0) result += `${days}d `;
-            if (hours > 0) result += `${hours}h `;
-            if (minutes > 0 || result === '') result += `${minutes}m`;
-            
-            return result.trim();
-        }
-
-        // ==================== UPDATE CHART ====================
-        function updateChart(playerCount) {
-            const ctx = document.getElementById('playerChart').getContext('2d');
-            
-            // Generate 24 data points (setiap jam)
+        function updateChart(activeWorlds) {
+            const ctx = document.getElementById('worldChart')?.getContext('2d');
+            if (!ctx) return;
+            const labels=[], data=[];
             const now = new Date();
-            const labels = [];
-            const data = [];
-            
-            // Data historis (24 jam terakhir) - fluktuasi natural
-            for (let i = 23; i >= 0; i--) {
-                const hour = new Date(now.getTime() - i * 60 * 60 * 1000);
-                labels.push(hour.getHours() + ':00');
-                
-                // Fluktuasi natural antara 3-37 player
-                if (i === 0) {
-                    data.push(playerCount); // current
-                } else {
-                    // Random fluktuasi yang realistis
-                    const baseVariation = Math.sin(i / 3) * 5; // pattern sinusoidal
-                    const randomVar = Math.floor(Math.random() * 8) - 4; // -4 sampai 4
-                    let value = Math.max(3, Math.min(37, 20 + baseVariation + randomVar));
-                    data.push(Math.round(value));
+            for (let i=23; i>=0; i--) {
+                const d = new Date(now.getTime() - i*3600000);
+                labels.push(d.getHours()+':00');
+                if (i===0) data.push(activeWorlds);
+                else {
+                    let val = Math.max(1, Math.min(50, activeWorlds + (Math.random()*6-3)));
+                    data.push(Math.round(val));
                 }
             }
-            
-            if (playerChart) {
-                playerChart.destroy();
-            }
-            
-            playerChart = new Chart(ctx, {
+            if (window.dashboardChart) window.dashboardChart.destroy();
+            window.dashboardChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
-                        label: 'Players Online',
-                        data: data,
+                        label: 'Active Worlds',
+                        data,
                         borderColor: '#4ade80',
-                        backgroundColor: 'rgba(74, 222, 128, 0.1)',
-                        tension: 0.4,
+                        backgroundColor: 'rgba(74,222,128,0.06)',
+                        borderWidth: 2,
+                        tension: 0.35,
                         fill: true,
                         pointBackgroundColor: '#4ade80',
-                        pointBorderColor: '#121215',
+                        pointBorderColor: '#121212',
                         pointRadius: 3,
                         pointHoverRadius: 5
                     }]
@@ -1106,199 +913,130 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e1e26',
-                            titleColor: '#d1d5db',
-                            bodyColor: '#9ca3af',
-                            borderColor: '#33333d',
-                            borderWidth: 1
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            grid: {
-                                color: '#22222a',
-                                display: false
-                            },
-                            ticks: {
-                                color: '#6b7280',
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: '#22222a'
-                            },
-                            ticks: {
-                                color: '#6b7280',
-                                stepSize: 5
-                            },
-                            min: 0,
-                            max: 40
-                        }
+                        x: { grid: { display: false }, ticks: { color: '#707070', maxRotation:45, font:{size:9} } },
+                        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#707070', stepSize:10 } }
                     }
                 }
             });
         }
 
-        // ==================== UPDATE UI ====================
-        async function updateStats() {
-            // Fetch dari multiple endpoints
-            const [main, status, worldsData] = await Promise.all([
-                fetchJSON(API_MAIN),
-                fetchJSON(API_STATUS),
-                fetchJSON(API_WORLDS)
-            ]);
-            
-            let currentPlayers = 0;
-            
-            // Update dari API MAIN
-            if (main) {
-                const state = main.state || {};
-                const tier = main.tier_info || {};
-                
-                const isOnline = state.server_status === 1;
-                const badge = document.getElementById('statusBadge');
-                badge.className = `inline-flex items-center gap-1.5 ${isOnline ? 'badge-online' : 'badge-offline'} px-3 py-1 rounded-full`;
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-400' : 'bg-red-400'} animate-pulse"></span><span>${isOnline ? 'Online' : 'Offline'}</span>`;
-                
-                currentPlayers = state.players_online || 0;
-                animateValue(document.getElementById('onlinePlayers'), currentPlayers);
-                animateValue(document.getElementById('cpuUsage'), (state.cpu_usage || 0).toFixed(1) + '%');
-                animateValue(document.getElementById('memoryUsage'), (state.memory_usage || 0) + ' MB');
-                animateValue(document.getElementById('storageUsage'), Math.round(state.storage_usage || 0) + ' MB');
-                document.getElementById('maxPlayers').textContent = tier.max_players_online || 4000;
-                
-                // Update bars
-                const cpu = state.cpu_usage || 0;
-                document.getElementById('cpuPercent').textContent = cpu.toFixed(1) + '%';
-                document.getElementById('cpuBar').style.width = cpu + '%';
-                
-                const memMB = state.memory_usage || 0;
-                const memPercent = Math.min(100, Math.round((memMB / 4096) * 100));
-                document.getElementById('memPercent').textContent = memPercent + '%';
-                document.getElementById('memBar').style.width = memPercent + '%';
-                
-                const storageMB = state.storage_usage || 0;
-                const storagePercent = Math.min(100, Math.round((storageMB / 2048) * 100));
-                document.getElementById('storagePercent').textContent = storagePercent + '%';
-                document.getElementById('storageBar').style.width = storagePercent + '%';
+        async function updateDashboard() {
+            const [main, status, worldsData] = await Promise.all([fetchJSON(API_MAIN), fetchJSON(API_STATUS), fetchJSON(API_WORLDS)]);
+            let serverName = 'GTPLAY', serverIP = '91.134.85.13:6986';
+            if (main?.server_name) serverName = main.server_name;
+            else if (main?.name) serverName = main.name;
+            else if (status?.server_name) serverName = status.server_name;
+            if (main?.ip) serverIP = main.ip;
+            if (main?.host) serverIP = main.host;
+            document.getElementById('serverName').innerHTML = serverName;
+            document.getElementById('serverIdBadge').innerHTML = 'ID: '+SERVER_ID;
+            document.getElementById('serverIP').innerHTML = serverIP;
+
+            let isOnline = false, playersOnline = 0;
+            if (main?.state) {
+                isOnline = main.state.server_status === 1;
+                playersOnline = main.state.players_online || 0;
+                const cpu = main.state.cpu_usage||0, mem = main.state.memory_usage||0, storage = main.state.storage_usage||0;
+                document.getElementById('cpuUsage').innerHTML = cpu.toFixed(1)+'%';
+                document.getElementById('memoryUsage').innerHTML = mem+' MB';
+                document.getElementById('storageUsage').innerHTML = Math.round(storage)+' MB';
+                document.getElementById('cpuPercent').innerHTML = cpu.toFixed(1)+'%';
+                document.getElementById('cpuBar').style.width = Math.min(100,cpu)+'%';
+                const memPercent = Math.min(100, Math.round((mem/4096)*100));
+                document.getElementById('memPercent').innerHTML = memPercent+'%';
+                document.getElementById('memBar').style.width = memPercent+'%';
+                const storagePercent = Math.min(100, Math.round((storage/2048)*100));
+                document.getElementById('storagePercent').innerHTML = storagePercent+'%';
+                document.getElementById('storageBar').style.width = storagePercent+'%';
             }
-            
-            // Update dari API STATUS
             if (status) {
-                // Set record online ke 37 (sesuai permintaan)
-                document.getElementById('recordPlayers').textContent = '37';
-                
-                if (status.max_players) {
-                    document.getElementById('maxPlayersRecord').textContent = status.max_players;
-                }
-                if (status.uptime) {
-                    document.getElementById('uptime').textContent = formatUptime(status.uptime);
-                }
-                
-                if (status.players_online) {
-                    currentPlayers = status.players_online;
-                }
-                
-                // Hitung load
-                if (status.players_online && status.max_players) {
-                    const loadPercent = (status.players_online / status.max_players) * 100;
-                    document.getElementById('loadBar').style.width = loadPercent + '%';
-                    document.getElementById('loadText').textContent = loadPercent.toFixed(1) + '%';
-                }
-                
-                if (!main && status.players_online !== undefined) {
-                    animateValue(document.getElementById('onlinePlayers'), status.players_online);
-                }
-                
-                if (!main && status.server_status) {
-                    const isOnline = status.server_status === 'online';
-                    const badge = document.getElementById('statusBadge');
-                    badge.className = `inline-flex items-center gap-1.5 ${isOnline ? 'badge-online' : 'badge-offline'} px-3 py-1 rounded-full`;
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-400' : 'bg-red-400'} animate-pulse"></span><span>${isOnline ? 'Online' : 'Offline'}</span>`;
-                }
+                if (status.server_status==='online'||status.server_status===1) isOnline = true;
+                if (status.players_online) playersOnline = status.players_online;
+            }
+            const statusDiv = document.getElementById('statusContainer');
+            const statusText = document.getElementById('statusText');
+            const playerSpan = document.getElementById('playerCount');
+            if (isOnline) {
+                statusDiv.className = 'status-badge status-online';
+                statusText.innerText = 'ONLINE';
+                playerSpan.innerText = '('+playersOnline+' players)';
+            } else {
+                statusDiv.className = 'status-badge status-offline';
+                statusText.innerText = 'OFFLINE';
+                playerSpan.innerText = '';
             }
 
-            // Update dari API WORLDS
             if (worldsData?.worlds) {
-                const list = worldsData.worlds;
-                document.getElementById('totalWorlds').textContent = worldsData.total_worlds || list.length;
-                document.getElementById('worldsCount').textContent = list.length + ' worlds';
-                
-                // Kategorisasi worlds: STARTS, BFG, SHOP
-                const startsWorlds = list.filter(w => w.name.startsWith('START')).length;
-                const bfgWorlds = list.filter(w => w.name.includes('BFG')).length;
-                const shopWorlds = list.filter(w => w.name.includes('SHOP') || w.name.includes('BUY')).length;
-                
-                document.getElementById('startsWorlds').textContent = startsWorlds;
-                document.getElementById('bfgWorlds').textContent = bfgWorlds;
-                document.getElementById('shopWorlds').textContent = shopWorlds;
-                
-                // Active vs Empty
-                const activeWorlds = list.filter(w => w.players > 0).length;
-                const emptyWorlds = list.length - activeWorlds;
-                
-                document.getElementById('activeWorldsCount').textContent = activeWorlds;
-                document.getElementById('emptyWorldsCount').textContent = emptyWorlds;
-                
-                const activePercent = (activeWorlds / list.length) * 100;
-                document.getElementById('activeWorldsBar').style.width = activePercent + '%';
-                document.getElementById('emptyWorldsBar').style.width = (100 - activePercent) + '%';
-                
-                // Top Worlds
-                const topWorlds = [...list].sort((a,b) => b.players - a.players).slice(0, 3);
-                let topHtml = '';
-                topWorlds.forEach((w, i) => {
-                    topHtml += `
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="flex items-center gap-2">
-                                <span class="text-${i === 0 ? 'yellow' : i === 1 ? 'gray' : 'orange'}-400">#${i+1}</span>
-                                <span>${w.name}</span>
-                            </span>
-                            <span class="text-gray-400">${w.players || 0} 👥</span>
-                        </div>
-                    `;
+                const worlds = worldsData.worlds;
+                document.getElementById('totalWorldsCount').innerHTML = worlds.length;
+                let starts=0,bfg=0,shop=0;
+                worlds.forEach(w=>{
+                    const cat = getCategory(w.name);
+                    if (cat==='STARTS') starts++;
+                    else if (cat==='BFG') bfg++;
+                    else if (cat==='SHOP') shop++;
                 });
-                document.getElementById('topWorldsList').innerHTML = topHtml;
-                
-                // Worlds Container
-                let html = '';
-                list.sort((a,b) => b.players - a.players).forEach(w => {
-                    const pc = w.players || 0;
-                    html += `
-                        <div class="world-card" onclick="alert('🌍 ${w.name}\\nPlayers: ${pc}')">
-                            <p class="font-medium text-gray-200">${w.name}</p>
-                            <span class="text-xs text-gray-500">👥 ${pc}</span>
-                        </div>
-                    `;
+                document.getElementById('startsWorlds').innerHTML = starts;
+                document.getElementById('bfgWorlds').innerHTML = bfg;
+                document.getElementById('shopWorlds').innerHTML = shop;
+                const active = worlds.filter(w=>(w.players||0)>0).length;
+                document.getElementById('activeWorldsCount').innerHTML = active;
+                document.getElementById('emptyWorldsCount').innerHTML = worlds.length-active;
+                let html='';
+                worlds.slice(0,30).forEach(w=>{
+                    const cat = getCategory(w.name);
+                    html += `<div class="world-card" onclick="alert('World: ${w.name.replace(/'/g,"\\\'")}\\nPlayers: ${w.players||0}')"><div class="world-name">${w.name}</div><span class="world-cat-tag cat-tag ${getTagClass(cat)}">${cat}</span></div>`;
                 });
-                document.getElementById('worldsContainer').innerHTML = html;
+                if (html) document.getElementById('worldsContainer').innerHTML = html;
+                updateChart(active);
             }
-            
-            // Update chart dengan current player count
-            if (currentPlayers > 0) {
-                updateChart(currentPlayers);
-            }
-            
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('id-ID');
+            document.getElementById('lastUpdate').innerHTML = new Date().toLocaleTimeString('en-US',{hour12:false});
         }
 
-        // ==================== INIT ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('whatsappLink').href = WA_LINK;
-            
-            // Set record online ke 37
-            document.getElementById('recordPlayers').textContent = '37';
-            
-            updateStats();
-            setInterval(updateStats, 5000); // Update every 5 seconds
+        // SEARCH ITEM
+        document.getElementById('searchItemBtn').addEventListener('click', async () => {
+            const itemId = document.getElementById('itemIdInput').value.trim();
+            if (!itemId) return showToast('Masukkan Item ID');
+            const itemResult = document.getElementById('itemResult');
+            const itemImage = document.getElementById('itemImage');
+            const downloadBtn = document.getElementById('downloadItemBtn');
+            const itemError = document.getElementById('itemError');
+            itemError.style.display = 'none';
+            itemImage.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            itemResult.classList.add('active');
+            const imgUrl = `https://api.gtps.cloud/api/item/texture/6986/${itemId}`;
+            try {
+                const resp = await fetch(imgUrl);
+                if (!resp.ok) throw new Error('Not found');
+                const blob = await resp.blob();
+                const objectURL = URL.createObjectURL(blob);
+                itemImage.src = objectURL;
+                itemImage.style.display = 'block';
+                downloadBtn.style.display = 'inline-flex';
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = objectURL;
+                    a.download = `item_${itemId}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+            } catch (e) {
+                itemError.style.display = 'block';
+                itemError.textContent = 'Gagal memuat item. Pastikan ID benar.';
+            }
         });
-    </script>
+
+        // INIT
+        updateDashboard();
+        setInterval(updateDashboard, 8000);
+        document.getElementById('nav-home')?.classList.add('active');
+        document.getElementById('page-home')?.classList.add('active');
+        allPages.slice(1).forEach(p => document.getElementById('page-'+p)?.classList.remove('active'));
+    })();
+</script>
 </body>
 </html>
