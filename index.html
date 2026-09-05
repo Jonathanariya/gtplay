@@ -171,10 +171,15 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .topbar-logo {
+        .topbar-left {
             display: flex;
             align-items: center;
             gap: 16px;
+        }
+        .topbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
         }
         .topbar-logo img {
@@ -1132,9 +1137,11 @@
     <div id="app">
         <!-- TOPBAR -->
         <header class="topbar">
-            <div class="topbar-logo" id="logoHomeBtn">
-                <img src="GTPLAY.jpeg" alt="GTPLAY Logo" onerror="this.style.display='none';">
-                <span class="logo-text">GTPLAY</span>
+            <div class="topbar-left">
+                <div class="topbar-logo" id="logoHomeBtn">
+                    <img src="GTPLAY.jpeg" alt="GTPLAY Logo" onerror="this.style.display='none';">
+                    <span class="logo-text">GTPLAY</span>
+                </div>
             </div>
             <div class="topbar-right">
                 <div class="burger-btn" id="burgerBtn" onclick="toggleBurger()">
