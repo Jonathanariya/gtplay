@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GrowSoft — GTPS Cloud Feature Showcase</title>
+    <!-- Font & Ikon -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0e14;
+            color: #eef2f6;
+            line-height: 1.6;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f6d365, #fda085);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #9aa5b5;
+            max-width: 700px;
+            margin: 0.75rem auto 0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #1e2a3a;
+            padding: 0.35rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #b9c7db;
+            margin-top: 0.5rem;
+            border: 1px solid #2d3d52;
+        }
+
+        /* Grid fitur */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: #141b24;
+            border-radius: 20px;
+            padding: 1.8rem 1.5rem;
+            border: 1px solid #25303e;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #f6d365;
+            box-shadow: 0 12px 30px rgba(246, 211, 101, 0.08);
+        }
+
+        .feature-card .icon {
+            font-size: 2.2rem;
+            color: #f6d365;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #f0f4fa;
+        }
+
+        .feature-card p {
+            color: #b0bed0;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+
+        .feature-card .tags {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-card .tag {
+            background: #1f2b39;
+            color: #b9c7db;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 30px;
+            border: 1px solid #2f4055;
+            letter-spacing: 0.02em;
+        }
+
+        .feature-card .code-snip {
+            margin-top: 1rem;
+            background: #0d121b;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            font-family: 'Menlo', 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: #c8d6e5;
+            border-left: 3px solid #f6d365;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .feature-card .profit-badge {
+            display: inline-block;
+            background: #1f3a2a;
+            color: #8bde9c;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            margin-top: 0.8rem;
+            align-self: flex-start;
+            border: 1px solid #2d5a3a;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            border-top: 1px solid #1f2b39;
+            padding-top: 2.5rem;
+            margin-top: 2rem;
+            color: #6f7d91;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #f6d365;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+        <h1>⚡ GrowSoft · Feature Vault</h1>
+        <p>Semua fitur API yang siap kamu monetisasi — berdasarkan dokumentasi resmi GrowSoft &amp; GTPS Cloud.</p>
+        <span class="badge"><i class="fas fa-code"></i> 14+ fitur siap pakai</span>
+    </header>
+
+    <!-- GRID FITUR -->
+    <div class="feature-grid">
+
+        <!-- 1. Subscription -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-crown"></i></div>
+            <h3>Subscription System</h3>
+            <p>Berlangganan VIP / Supporter / Growpass dengan durasi fleksibel. Beri akses eksklusif, role, dan bonus otomatis.</p>
+            <div class="code-snip">player:addSubscription(TYPE_MONTH, os.time() + 30*86400)</div>
+            <div class="profit-badge">💰 Pendapatan berulang</div>
+            <div class="tags">
+                <span class="tag">#player</span>
+                <span class="tag">#subscription</span>
+                <span class="tag">#role</span>
+            </div>
+        </div>
+
+        <!-- 2. Custom Item -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-gem"></i></div>
+            <h3>Custom Item &amp; Texture</h3>
+            <p>Buat item unik dengan efek khusus (extra gems, XP, one‑hit). Texture kustom via <code>includeClientFile</code>.</p>
+            <div class="code-snip">registerLuaItem({ id=21000, name="Excalibur", effects={extra_gems=50} })</div>
+            <div class="profit-badge">💰 Jual item eksklusif</div>
+            <div class="tags">
+                <span class="tag">#item</span>
+                <span class="tag">#texture</span>
+                <span class="tag">#lua</span>
+            </div>
+        </div>
+
+        <!-- 3. Redeem Code -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-ticket-alt"></i></div>
+            <h3>Redeem Code System</h3>
+            <p>Buat kode redeem dengan hadiah gems, coins, item, title, bahkan role. Bisa dibatasi level, playtime, dan jumlah pemakaian.</p>
+            <div class="code-snip">createRedeemCode({ redeemCode="VIP2026", obtainGems=5000, maxUses=1 })</div>
+            <div class="profit-badge">💰 Jual kode di luar game</div>
+            <div class="tags">
+                <span class="tag">#code</span>
+                <span class="tag">#reward</span>
+                <span class="tag">#voucher</span>
+            </div>
+        </div>
+
+        <!-- 4. Role & Title -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-id-badge"></i></div>
+            <h3>Role &amp; Title Manager</h3>
+            <p>Berikan role khusus (Supporter, Legend) dan title kustom yang tampil di profil. Bisa dijual sebagai status premium.</p>
+            <div class="code-snip">player:addRole(SUPPORTER_ROLE)  player:addTitle(CUSTOM_TITLE)</div>
+            <div class="profit-badge">💰 Jual status eksklusif</div>
+            <div class="tags">
+                <span class="tag">#role</span>
+                <span class="tag">#title</span>
+                <span class="tag">#profile</span>
+            </div>
+        </div>
+
+        <!-- 5. Store & Daily Offers -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-store"></i></div>
+            <h3>In‑Game Store &amp; Daily Offers</h3>
+            <p>Kelola toko harian dengan item diskon, batasi pembelian per pemain. Integrasi dengan sistem economy.</p>
+            <div class="code-snip">getActiveDailyOffers()  addDailyOfferPurchased(userID, storeItemID)</div>
+            <div class="profit-badge">💰 Penjualan langsung</div>
+            <div class="tags">
+                <span class="tag">#shop</span>
+                <span class="tag">#daily</span>
+                <span class="tag">#offer</span>
+            </div>
+        </div>
+
+        <!-- 6. World Access Control -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-door-open"></i></div>
+            <h3>World Access &amp; Premium Worlds</h3>
+            <p>Kontrol akses ke dunia tertentu. Buat dunia premium (FARM, PVP) yang hanya bisa dimasuki dengan tiket atau subscription.</p>
+            <div class="code-snip">world:addAccess(player, 0)  world:addTileAccess(player, tile)</div>
+            <div class="profit-badge">💰 Sewa dunia / tiket masuk</div>
+            <div class="tags">
+                <span class="tag">#world</span>
+                <span class="tag">#access</span>
+                <span class="tag">#premium</span>
+            </div>
+        </div>
+
+        <!-- 7. Minigame System -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-gamepad"></i></div>
+            <h3>Minigame &amp; Event</h3>
+            <p>Buat minigame seperti Survival, Parkour, Dungeon. Kenakan biaya masuk, berikan hadiah eksklusif, dan buat leaderboard.</p>
+            <div class="code-snip">local game = Survival.new(world)  game:addPlayer(player)</div>
+            <div class="profit-badge">💰 Biaya masuk + hadiah</div>
+            <div class="tags">
+                <span class="tag">#minigame</span>
+                <span class="tag">#event</span>
+                <span class="tag">#dungeon</span>
+            </div>
+        </div>
+
+        <!-- 8. Economy & Market -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Economy &amp; Market</h3>
+            <p>Sistem ekonomi dengan fluktuasi harga, pajak transaksi, dan treasury server. Bisa disesuaikan untuk mengendalikan inflasi.</p>
+            <div class="code-snip">economy.tax_rate = 0.05  economy.buyItem(player, itemID, amount)</div>
+            <div class="profit-badge">💰 Pajak &amp; treasury</div>
+            <div class="tags">
+                <span class="tag">#economy</span>
+                <span class="tag">#market</span>
+                <span class="tag">#tax</span>
+            </div>
+        </div>
+
+        <!-- 9. HTTP API & Webhook -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-globe"></i></div>
+            <h3>HTTP API &amp; Webhook</h3>
+            <p>Terima request HTTP untuk integrasi dengan website, payment gateway (Midtrans, Xendit), dan sistem eksternal.</p>
+            <div class="code-snip">onHTTPRequest(function(req) if req.path=="/buy" then ... end end)</div>
+            <div class="profit-badge">💰 Integrasi pembayaran</div>
+            <div class="tags">
+                <span class="tag">#api</span>
+                <span class="tag">#webhook</span>
+                <span class="tag">#payment</span>
+            </div>
+        </div>
+
+        <!-- 10. Discord Integration -->
+        <div class="feature-card">
+            <div class="icon"><i class="fab fa-discord"></i></div>
+            <h3>Discord Bot Integration</h3>
+            <p>Bot Discord untuk menjual item, menerima pembayaran, dan notifikasi otomatis. Dukung button &amp; form interaktif.</p>
+            <div class="code-snip">onDiscordButtonClickCallback(function(event) ... end)</div>
+            <div class="profit-badge">💰 Jual via Discord</div>
+            <div class="tags">
+                <span class="tag">#discord</span>
+                <span class="tag">#bot</span>
+                <span class="tag">#button</span>
+            </div>
+        </div>
+
+        <!-- 11. Leaderboard & Competition -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-trophy"></i></div>
+            <h3>Leaderboard &amp; Competition</h3>
+            <p>Adakan event kompetisi dengan hadiah besar. Pantau top player dan berikan reward otomatis di akhir periode.</p>
+            <div class="code-snip">getTopPlayerByBalance()  onLeaderboardEndCallback(function(...) end)</div>
+            <div class="profit-badge">💰 Tiket event + hadiah</div>
+            <div class="tags">
+                <span class="tag">#leaderboard</span>
+                <span class="tag">#competition</span>
+                <span class="tag">#reward</span>
+            </div>
+        </div>
+
+        <!-- 12. Player Autofarm (2/22–3/4/2026) -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-robot"></i></div>
+            <h3>Autofarm &amp; Automation</h3>
+            <p>Sistem autofarm bawaan dengan kontrol slot, target block, dan delay kustom. Bisa dijual sebagai layanan premium.</p>
+            <div class="code-snip">player:getAutofarm():setTargetBlockID(2)  player:setCustomAutofarmDelay(200)</div>
+            <div class="profit-badge">💰 Layanan otomatisasi</div>
+            <div class="tags">
+                <span class="tag">#autofarm</span>
+                <span class="tag">#automation</span>
+                <span class="tag">#farming</span>
+            </div>
+        </div>
+
+        <!-- 13. Blessing & Power Orb (4/21/2026) -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-star"></i></div>
+            <h3>Blessing &amp; Power Orb</h3>
+            <p>Berikan blessing (power orb) yang memberi efek khusus. Bisa dijual sebagai konsumable premium dengan durasi terbatas.</p>
+            <div class="code-snip">player:addBlessing(blessing_id)  player:hasActiveBlessing(id)</div>
+            <div class="profit-badge">💰 Jual buff temporer</div>
+            <div class="tags">
+                <span class="tag">#blessing</span>
+                <span class="tag">#buff</span>
+                <span class="tag">#powerorb</span>
+            </div>
+        </div>
+
+        <!-- 14. NPC & Quest System -->
+        <div class="feature-card">
+            <div class="icon"><i class="fas fa-robot"></i></div>
+            <h3>NPC &amp; Quest System</h3>
+            <p>Buat NPC interaktif dengan dialog, quest harian, dan sistem reward. Cocok untuk konten story atau event.</p>
+            <div class="code-snip">world:createNPC("Guard", x, y)  npc:setNickname("Captain")</div>
+            <div class="profit-badge">💰 Quest premium</div>
+            <div class="tags">
+                <span class="tag">#npc</span>
+                <span class="tag">#quest</span>
+                <span class="tag">#dialog</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>
+            Berdasarkan dokumentasi resmi 
+            <a href="https://esperia.live/dev" target="_blank">GrowSoft</a> &amp; 
+            <a href="https://beta.gtps.cloud/docs" target="_blank">GTPS Cloud</a>.
+            <br />
+            <i class="fas fa-code"></i> Semua fitur dapat diimplementasikan dengan Lua.
+        </p>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">
+            <i class="fas fa-rocket"></i> Siap untuk membangun server profit-mu sendiri.
+        </p>
+    </footer>
+
+</div>
+</body>
+</html>
